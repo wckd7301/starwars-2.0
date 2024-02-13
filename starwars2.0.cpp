@@ -9,6 +9,8 @@ void  display(int display_code);    //a function which gets a code, and displays
 
 int MainMenu_input();
 
+void grid (int map_size);
+
 int main() {
 	
 	run();
@@ -22,7 +24,7 @@ void run() {
 	
 	int map_size = MainMenu_input();
 	
-	
+	grid (map_size);
 	
 	
 	
@@ -161,3 +163,37 @@ int MainMenu_input() {
 	
 	
 }
+void grid (int map_size){
+	int k = map_size*2 + 1;
+	int h = map_size*4 + 1;
+	int i,j;
+	char grid1[k][h]; 
+    for (int i = 0; i < k;i++){
+    	for (int j = 0;j < h;j++){
+    			if (i%2!=0){	
+			if (j%4==0){
+			grid1[i][j]='|';		
+			}
+			else
+			grid1[i][j]=' ';
+	}
+	else {
+		if (j%4==0)
+		grid1[i][j]=' ';
+		else 
+		grid1[i][j]='-';
+	}
+
+		}
+	}
+	system("cls");
+    for (int i = 0; i < k;i++){
+    	for (int j = 0;j < h;j++){
+			cout << grid1[i][j];
+			if (j == h - 1)
+			cout << endl;
+	}
+			}
+
+
+	}
