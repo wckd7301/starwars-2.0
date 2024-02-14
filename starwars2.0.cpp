@@ -1,6 +1,9 @@
 #include <iostream>
 #include <cstdlib>
 #include <conio.h>
+#include <chrono>
+#include <thread>
+
 using namespace std;
 
 void run();
@@ -9,7 +12,9 @@ void  display(int display_code);    //a function which gets a code, and displays
 
 int MainMenu_input();
 
-void grid (int map_size);
+char** map (int map_size);
+
+void render_map (char** pointer_to_map, int map_size);
 
 int main() {
 	
@@ -24,9 +29,9 @@ void run() {
 	
 	int map_size = MainMenu_input();
 	
-	grid (map_size);
+	char** pointer_to_map = map (map_size);
 	
-	
+	render_map (pointer_to_map, map_size);
 	
 	
 	
@@ -58,7 +63,7 @@ void display (int display_code) {
 			
 			cout << "---------------------------------\n|      Select the map size:     |\n";
 			cout << "|                               |\n|          1. 15 * 15           |\n";
-			cout << "|          2. 20 * 20           |\n|          3. 25 * 25           |\n";
+			cout << "|          2. 17 * 17           |\n|          3. 19 * 19           |\n";
 			cout << "|     4. Enter the map size     |\n";
 			cout << "|                               |\n---------------------------------";
 			
@@ -74,7 +79,7 @@ void display (int display_code) {
 			break;
 		}
 		
-		case 3:{
+		case 3: {
 			
 			system("cls");
 			
@@ -85,6 +90,16 @@ void display (int display_code) {
 			break;
 		}
 		
+		case 4: {
+			
+			system ("cls");
+			
+			cout << "It would be better if the map size was an odd number, so the map size that has been entered will be plus 1.";
+			
+			this_thread::sleep_for(chrono::seconds(3));
+			
+			break;
+		}
 	}
 
 }
@@ -113,11 +128,11 @@ int MainMenu_input() {
 					}
 			    	
 			    	case '2': {
-						return 20;
+						return 17;
 					}
 			    	
 			    	case '3': {
-						return 25;
+						return 19;
 					}
 					
 					case '4': {
@@ -131,7 +146,11 @@ int MainMenu_input() {
 						    
 						    if (map_size < 15)
 						        display (3);
-						    
+						    else if (map_size % 2 == 0){
+						    	
+						    	
+						    	
+							}
 							else
 							    return map_size;
 					    }
@@ -163,37 +182,65 @@ int MainMenu_input() {
 	
 	
 }
-void grid (int map_size){
-	int k = map_size*2 + 1;
-	int h = map_size*4 + 1;
-	int i,j;
-	char grid1[k][h]; 
-    for (int i = 0; i < k;i++){
-    	for (int j = 0;j < h;j++){
-    			if (i%2!=0){	
-			if (j%4==0){
-			grid1[i][j]='|';		
-			}
-			else
-			grid1[i][j]=' ';
-	}
-	else {
-		if (j%4==0)
-		grid1[i][j]=' ';
-		else 
-		grid1[i][j]='-';
-	}
+
+
+char** map (int map_size){
+	
+	int rows = map_size * 2 + 1;
+	
+    int cols = map_size * 4 + 1;
+	
+	char** grid = new char*[rows];                   //allocating memory for the grid, dynamicaly.
+    
+    
+    for (int i = 0; i < rows; ++i) {                 //alocating memory to each row, dynamicaly.
+        grid[i] = new char[cols];
+    }
+    
+	for (int i = 0; i < rows; i++){                  //creating an empty map.
+    
+		for (int j = 0;j < cols; j++){
+    		
+			if (i%2 != 0){	
+			    
+				if (j%4 == 0)
+			        grid[i][j] = '|';		
+			
+			    else
+			        grid[i][j] = ' ';
+	        }
+	
+	        else {
+	
+		        if (j%4 == 0)
+		            grid[i][j] = ' ';
+	
+		        else 
+		            grid[i][j] = '-';
+	        }
 
 		}
 	}
-	system("cls");
-    for (int i = 0; i < k;i++){
-    	for (int j = 0;j < h;j++){
-			cout << grid1[i][j];
-			if (j == h - 1)
-			cout << endl;
-	}
-			}
+	
+	grid [map_size * 2 - 1][map_size * 2] = '#';                          //adding the ship to the map.
+    
 
+	return grid;
+}
 
-	}
+void render_map (char** grid, int map_size){
+
+    system("cls");
+	
+	for (int i = 0; i < map_size * 2 + 1; i++)
+	    for (int j = 0; j < map_size * 4 + 1; j++){
+	    	
+	    	cout << grid [i][j];
+	    	
+	    	if (j == 4 * map_size )
+	    	    cout << endl;
+		}
+	
+	
+	
+}
