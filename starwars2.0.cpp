@@ -6,15 +6,26 @@
 
 using namespace std;
 
+struct ship {
+  
+    int friendly_x;
+    int friendly_y;
+  
+    int enemy_x;
+    int enemy_y;
+    string enemy_name;
+    
+};
+
 void run();
 
 void  display(int display_code);    //a function which gets a code, and displays what needs to be displayed based on that code
 
 int MainMenu_input();
 
-char** map (int map_size);
+void map (int map_size, ship location);
 
-void render_map (char** pointer_to_map, int map_size);
+void render (int map_size, ship location);
 
 int main() {
 	
@@ -29,13 +40,12 @@ void run() {
 	
 	int map_size = MainMenu_input();
 	
-	char** pointer_to_map = map (map_size);
+	ship location;
 	
-	render_map (pointer_to_map, map_size);
+	location.friendly_x = map_size / 2;
+	location.friendly_y = map_size;
 	
-	
-	
-	
+	render (map_size, location);
 	
 	
 }
@@ -184,63 +194,36 @@ int MainMenu_input() {
 }
 
 
-char** map (int map_size){
-	
-	int rows = map_size * 2 + 1;
-	
-    int cols = map_size * 4 + 1;
-	
-	char** grid = new char*[rows];                   //allocating memory for the grid, dynamicaly.
-    
-    
-    for (int i = 0; i < rows; ++i) {                 //alocating memory to each row, dynamicaly.
-        grid[i] = new char[cols];
-    }
-    
-	for (int i = 0; i < rows; i++){                  //creating an empty map.
-    
-		for (int j = 0;j < cols; j++){
-    		
-			if (i%2 != 0){	
-			    
-				if (j%4 == 0)
-			        grid[i][j] = '|';		
+void render (int map_size, ship location){
+
+	system ("cls");
 			
-			    else
-			        grid[i][j] = ' ';
-	        }
-	
-	        else {
-	
-		        if (j%4 == 0)
-		            grid[i][j] = ' ';
-	
-		        else 
-		            grid[i][j] = '-';
-	        }
-
-		}
-	}
-	
-	grid [map_size * 2 - 1][map_size * 2] = '#';                          //adding the ship to the map.
+ 	int rows = 2 * map_size + 1;
+    int cols = 4 * map_size + 1;
     
-
-	return grid;
-}
-
-void render_map (char** grid, int map_size){
-
-    system("cls");
-	
-	for (int i = 0; i < map_size * 2 + 1; i++)
-	    for (int j = 0; j < map_size * 4 + 1; j++){
-	    	
-	    	cout << grid [i][j];
-	    	
-	    	if (j == 4 * map_size )
-	    	    cout << endl;
-		}
-	
-	
-	
+    for (int i = 0; i < rows; i++)	
+        for (int j = 0; j < cols; j++){
+            if (i % 2 == 0){
+                if (j % 4 == 0)
+                    cout << ' ';
+                else 
+                    cout << '-';	
+            }
+            else {
+                if (j % 4 == 0)
+                    cout << '|';
+                else if (j % 4 == 1 || j % 4 == 3)
+                    cout << ' ';
+                else {
+                    if (((j + 2) / 4) - 1 == location.friendly_x && (i + 1) / 2 == location.friendly_y)
+                        cout << '#';
+                    else 
+                        cout << ' ';			
+                }
+            }  
+        
+            if (j == cols - 1)
+                cout << endl;
+        }			
+			
 }
