@@ -290,12 +290,18 @@ void move_ship (data& map) {
 			
 			case 75: {              //if user presses the left arrow key
 			
+				if (map.friendly_x == 0)
+				    break;
+			
 				map.friendly_x --;
 			    
 				break;
 			}
 		
 			case 77: {              //if user presses the right arrow key 
+				
+				if (map.friendly_x == map.map_size - 1)
+				    break;
 				
 				map.friendly_x ++;
 				
