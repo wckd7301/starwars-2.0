@@ -111,9 +111,9 @@ void display (int display_code) {
 	
 		case 5: {
 			
-			cout << "\nWrong input!(Press any key to continue . . .)";
+			cout << "\nWrong input!(Press the Enter key to continue . . .)";
 			
-			_getch();
+			cin.ignore();
 			
 			break;
 		}
@@ -301,7 +301,7 @@ void move_ship (data& map) {
 	    }
 	}
 	
-	else if (input == 27)		//if the esc key gets pressed
+	else if (input == 27)		   //if the esc key gets pressed
 	    cout << "esc";
 	    
 	else 
