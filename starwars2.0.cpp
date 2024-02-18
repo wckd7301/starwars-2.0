@@ -164,9 +164,12 @@ int MainMenu_input() {
 						    
 						    if (map_size < 15)
 						        display (3);
-						    else if (map_size % 2 == 0){
-						    	
-						    	
+						    
+							else if (map_size % 2 == 0){
+						    
+								display (4);
+						    
+							    return map_size + 1;	
 						    	
 							}
 							else
@@ -301,9 +304,9 @@ void move_ship (data& map) {
 	    }
 	}
 	
-	else if (input == 27)		   //if the esc key gets pressed
+	else if (input == 27){		   //if the esc key gets pressed
 	    cout << "esc";
-	    
+	    cin.ignore();}
 	else 
 	    display(5);
 	
