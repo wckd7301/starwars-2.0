@@ -6,7 +6,7 @@
 
 using namespace std;
 
-struct ship {
+struct data {
   
     int friendly_x;
     int friendly_y;
@@ -15,6 +15,7 @@ struct ship {
     int enemy_y;
     string enemy_name;
     
+    int map_size;
 };
 
 void run();
@@ -23,9 +24,9 @@ void  display(int display_code);    //a function which gets a code, and displays
 
 int MainMenu_input();
 
-void map (int map_size, ship location);
+void render (data& map);
 
-void render (int map_size, ship location);
+void initialize_game (data& map);
 
 int main() {
 	
@@ -36,18 +37,9 @@ int main() {
 
 void run() {
 	
-	display(0);
+	data map;
 	
-	int map_size = MainMenu_input();
-	
-	ship location;
-	
-	location.friendly_x = map_size / 2;
-	location.friendly_y = map_size;
-	
-	render (map_size, location);
-	
-	
+	initialize_game (map);
 }
 
 void display (int display_code) {
@@ -194,12 +186,12 @@ int MainMenu_input() {
 }
 
 
-void render (int map_size, ship location){
+void render (data& map){
 
 	system ("cls");
 			
- 	int rows = 2 * map_size + 1;
-    int cols = 4 * map_size + 1;
+ 	int rows = 2 * map.map_size + 1;
+    int cols = 4 * map.map_size + 1;
     
     for (int i = 0; i < rows; i++)	
         for (int j = 0; j < cols; j++){
@@ -215,7 +207,7 @@ void render (int map_size, ship location){
                 else if (j % 4 == 1 || j % 4 == 3)
                     cout << ' ';
                 else {
-                    if (((j + 2) / 4) - 1 == location.friendly_x && (i + 1) / 2 == location.friendly_y)
+                    if (((j + 2) / 4) - 1 == map.friendly_x && (i + 1) / 2 == map.friendly_y)
                         cout << '#';
                     else 
                         cout << ' ';			
@@ -226,4 +218,16 @@ void render (int map_size, ship location){
                 cout << endl;
         }			
 			
+}
+
+
+void initialize_game (data& map) {
+
+    display(0);
+	
+	map.map_size = MainMenu_input();
+	
+	map.friendly_x = map.map_size / 2;
+	map.friendly_y = map.map_size;
+	
 }
