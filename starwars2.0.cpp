@@ -30,6 +30,8 @@ void initialize_game (data& map);
 
 void run1 (data& map);
 
+void move_ship (data& map);
+
 int main() {
 	
 	run();
@@ -106,6 +108,16 @@ void display (int display_code) {
 			
 			break;
 		}
+	
+		case 5: {
+			
+			cout << "\nWrong input!(Press any key to continue . . .)";
+			
+			_getch();
+			
+			break;
+		}
+	
 	}
 
 }
@@ -240,13 +252,59 @@ void run1 (data& map){
 	
 	render (map);
 	
-	
-	
-	
+	move_ship (map);
 	
 	
 	
 	
 	run1(map);
+	
+}
+
+
+void move_ship (data& map) {
+	
+	int input; 
+	
+	input = getch(); 
+		
+	if (input == 224) {
+		
+		input = getch();
+		
+		switch (input){
+			
+			case 72: {
+				
+				display(5);
+				
+				break;
+			}
+			
+			case 80: {               //if user presses the down arrow key
+				break;
+			}
+			
+			case 75: {              //if user presses the left arrow key
+			
+				map.friendly_x --;
+			    
+				break;
+			}
+		
+			case 77: {              //if user presses the right arrow key 
+				
+				map.friendly_x ++;
+				
+				break;
+			}
+	    }
+	}
+	
+	else if (input == 27)		//if the esc key gets pressed
+	    cout << "esc";
+	    
+	else 
+	    display(5);
 	
 }
