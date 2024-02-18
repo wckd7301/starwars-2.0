@@ -3,6 +3,7 @@
 #include <conio.h>
 #include <chrono>
 #include <thread>
+#include <ctime>
 
 using namespace std;
 
@@ -10,10 +11,13 @@ struct data {
   
     int friendly_x;
     int friendly_y;
-  
-    int enemy_x;
-    int enemy_y;
-    string enemy_name;
+	int friendly_hp;
+	
+	string enemy_name;
+    int enemy_size;
+    int enemy_x;					//for the top left block of the enemy
+    int enemy_y;					//for the top left block of the enemy
+    int enemy_hp;
     
     int map_size;
 };
@@ -32,6 +36,8 @@ void run1 (data& map);
 
 void move_ship (data& map);
 
+void spawn_enemy (data& map);
+
 int main() {
 	
 	run();
@@ -40,6 +46,8 @@ int main() {
 }
 
 void run() {
+	
+	srand (time (0));
 	
 	data map;
 	
@@ -249,7 +257,13 @@ void initialize_game (data& map) {
 	map.friendly_x = map.map_size / 2;
 	map.friendly_y = map.map_size;
 	
+	map.friendly_hp = 3;
+
+	map.enemy_hp = 0;                        //making the enemy's hitpoints 0 in the beginning so the run1 function spawns an enemy using the spawn_enemy function
+
 }
+	
+	
 
 void run1 (data& map){
 	
@@ -315,5 +329,72 @@ void move_ship (data& map) {
 	    cin.ignore();}
 	else 
 	    display(5);
+	
+}
+
+
+void spawn_enemy (data& map) {
+	
+	map.enemy_size = rand() % 4 + 1;
+	
+	switch (map.enemy_size) {
+		
+		case 1: {
+			
+			map.enemy_name = "Dart";
+			
+			map.enemy_hp = 1;
+			
+			map.enemy_x = rand() % map.map_size;		//these x and y variables belong to the top left block of the enemy, as previously metioned.
+			map.enemy_y = 0;			
+			
+			
+			break;
+		}
+		
+		case 2: {
+			
+			map.enemy_name = "Striker";
+			
+			map.enemy_hp = 2;
+	
+			map.enemy_x = rand() % (map.map_size - 1);			//because the size of the ship is 2*2, the left most blocks of the ship need to be off the right edge of the map by at least 1 unit.
+			map.enemy_y = 0;
+			
+			break;
+		}
+		
+		case 3: {
+			
+			map.enemy_name = "Wraith";
+			
+			map.enemy_hp = 4;
+			
+			map.enemy_x = rand() % (map.map_size - 2);
+			map.enemy_y = 0;
+			
+			break;
+		}
+		
+		case 4: {
+			
+			map.enemy_name = "Banshee";
+			
+			map.enemy_hp = 6;
+	
+			map.enemy_x = rand() % (map.map_size - 3);
+			map.enemy_y = 0;
+			
+			break;
+		}
+	}
+	
+	
+	
+	
+	
+	
+	
+	
 	
 }
