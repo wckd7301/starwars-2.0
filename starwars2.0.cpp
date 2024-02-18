@@ -28,6 +28,8 @@ void render (data& map);
 
 void initialize_game (data& map);
 
+void run1 (data& map);
+
 int main() {
 	
 	run();
@@ -40,6 +42,8 @@ void run() {
 	data map;
 	
 	initialize_game (map);
+	
+    run1(map);
 }
 
 void display (int display_code) {
@@ -229,5 +233,20 @@ void initialize_game (data& map) {
 	
 	map.friendly_x = map.map_size / 2;
 	map.friendly_y = map.map_size;
+	
+}
+
+void run1 (data& map){
+	
+	render (map);
+	
+	
+	
+	
+	
+	
+	
+	
+	run1(map);
 	
 }
