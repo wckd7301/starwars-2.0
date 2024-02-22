@@ -457,7 +457,15 @@ void enemy_ship (data& info, int** map) {
 
 void destroy_enemy (data& info, int** map) {
 	
+	for (int i = 0; i < info.map_size; i++)
+		for (int j = 0; j < info.map_size; j++)
+			if (map[i][j] == 2)
+				map[i][j] = 0;
 	
+	for (int i = 0; i < info.map_size; i++)
+		for (int j = 0; j < info.map_size; j++)
+			if (map[i][j] == 2)
+				map[i][j] = 0;
 	
-	
+	info.enemy_hp = 0;		
 }
