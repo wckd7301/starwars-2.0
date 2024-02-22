@@ -28,15 +28,15 @@ void  display(int display_code);    //a function which gets a code, and displays
 
 int MainMenu_input();
 
-void render (data& map);
+void render (data& info);
 
-void initialize_game (data& map);
+int** initialize_game (data& info);
 
-void run1 (data& map);
+void run1 (data& info);
 
-void move_ship (data& map);
+void move_ship (data& info);
 
-void spawn_enemy (data& map);
+void spawn_enemy (data& info);
 
 int main() {
 	
@@ -49,11 +49,14 @@ void run() {
 	
 	srand (time (0));
 	
-	data map;
+	data info;
 	
-	initialize_game (map);
+	/*the 2d array 'map' that has been allocated dynamically, is an array that store one of the 4 values
+	{0, 1, 2, 3} for each coordiantion in the map. 0 indicates that the location is empty, 1 is for friendly 
+	ship, 2 is for enemy ship and 3 indicates that there is a bullet in the location. */ 
+	int** map = initialize_game (info);
 	
-    run1(map);
+    run1(info);
 }
 
 void display (int display_code) {
@@ -213,12 +216,12 @@ int MainMenu_input() {
 }
 
 
-void render (data& map){
+void render (data& info){
 
 	system ("cls");
 			
- 	int rows = 2 * map.map_size + 1;
-    int cols = 4 * map.map_size + 1;
+ 	int rows = 2 * info.map_size + 1;
+    int cols = 4 * info.map_size + 1;
     
     for (int i = 0; i < rows; i++)	
         for (int j = 0; j < cols; j++){
@@ -234,9 +237,11 @@ void render (data& map){
                 else if (j % 4 == 1 || j % 4 == 3)
                     cout << ' ';
                 else {
-                    if (((j + 2) / 4) - 1 == map.friendly_x && (i + 1) / 2 == map.friendly_y)
+                    if (((j + 2) / 4) - 1 == info.friendly_x && (i + 1) / 2 == info.friendly_y)
                         cout << '#';
-                    else 
+                    else if (((j + 1) / 4) == info.enemy_x && (i + 1) / 2 == info.enemy_y)
+						cout << '*';
+					else 
                         cout << ' ';			
                 }
             }  
@@ -248,38 +253,47 @@ void render (data& map){
 }
 
 
-void initialize_game (data& map) {
+int** initialize_game (data& info) {
 
     display(0);
 	
-	map.map_size = MainMenu_input();
+	info.map_size = MainMenu_input();
 	
-	map.friendly_x = map.map_size / 2;
-	map.friendly_y = map.map_size;
+	int** map = new int*[info.map_size];		//dynamically allocating memory for all the rows of the map combined.
 	
-	map.friendly_hp = 3;
+	for (int i = 0; i < info.map_size; i++)		//dynamically allocating memory for every single row of the map.
+		map[i] = new int[info.map_size];
+	
+	for (int i = 0; i < info.map_size; i++)		//setting all the values to 0, meaning that in the start of the game, we have a completely empty map.
+		for ( int j = 0; j < info.map_size; j++)
+			map[i][j] = 0;
+			
+			
+	
+	info.friendly_hp = 3;
 
-	map.enemy_hp = 0;                        //making the enemy's hitpoints 0 in the beginning so the run1 function spawns an enemy using the spawn_enemy function
-
+	info.enemy_hp = 0;            	            //making the enemy's hitpoints 0 in the start of the game so the run1 function spawns an enemy using the spawn_enemy function
+	
+	return map;
 }
 	
 	
 
-void run1 (data& map){
+void run1 (data& info){
 	
-	render (map);
+	render (info);
 	
-	move_ship (map);
+	move_ship (info);
 	
+	if (info.enemy_hp == 0)
+	    spawn_enemy(info);
 	
-	
-	
-	run1(map);
+	run1(info);
 	
 }
 
 
-void move_ship (data& map) {
+void move_ship (data& info) {
 	
 	int input; 
 	
@@ -304,20 +318,20 @@ void move_ship (data& map) {
 			
 			case 75: {              //if user presses the left arrow key
 			
-				if (map.friendly_x == 0)
+				if (info.friendly_x == 0)
 				    break;
 			
-				map.friendly_x --;
+				info.friendly_x --;
 			    
 				break;
 			}
 		
 			case 77: {              //if user presses the right arrow key 
 				
-				if (map.friendly_x == map.map_size - 1)
+				if (info.friendly_x == info.map_size - 1)
 				    break;
 				
-				map.friendly_x ++;
+				info.friendly_x ++;
 				
 				break;
 			}
@@ -333,20 +347,20 @@ void move_ship (data& map) {
 }
 
 
-void spawn_enemy (data& map) {
+void spawn_enemy (data& info) {
 	
-	map.enemy_size = rand() % 4 + 1;
+	info.enemy_size = rand() % 4 + 1;
 	
-	switch (map.enemy_size) {
+	switch (info.enemy_size) {
 		
 		case 1: {
 			
-			map.enemy_name = "Dart";
+			info.enemy_name = "Dart";
 			
-			map.enemy_hp = 1;
+			info.enemy_hp = 1;
 			
-			map.enemy_x = rand() % map.map_size;		//these x and y variables belong to the top left block of the enemy, as previously metioned.
-			map.enemy_y = 0;			
+			info.enemy_x = rand() % (info.map_size);		//these x and y variables belong to the top left block of the enemy, as previously metioned.
+			info.enemy_y = 1;			
 			
 			
 			break;
@@ -354,47 +368,38 @@ void spawn_enemy (data& map) {
 		
 		case 2: {
 			
-			map.enemy_name = "Striker";
+			info.enemy_name = "Striker";
 			
-			map.enemy_hp = 2;
+			info.enemy_hp = 2;
 	
-			map.enemy_x = rand() % (map.map_size - 1);			//because the size of the ship is 2*2, the left most blocks of the ship need to be off the right edge of the map by at least 1 unit.
-			map.enemy_y = 0;
+			info.enemy_x = rand() % (info.map_size - 1);			//because the size of the ship is 2*2, the left most blocks of the ship need to be off the right edge of the map by at least 1 unit.
+			info.enemy_y = 1;
 			
 			break;
 		}
 		
 		case 3: {
 			
-			map.enemy_name = "Wraith";
+			info.enemy_name = "Wraith";
 			
-			map.enemy_hp = 4;
+			info.enemy_hp = 4;
 			
-			map.enemy_x = rand() % (map.map_size - 2);
-			map.enemy_y = 0;
+			info.enemy_x = rand() % (info.map_size - 2);
+			info.enemy_y = 1;
 			
 			break;
 		}
 		
 		case 4: {
 			
-			map.enemy_name = "Banshee";
+			info.enemy_name = "Banshee";
 			
-			map.enemy_hp = 6;
+			info.enemy_hp = 6;
 	
-			map.enemy_x = rand() % (map.map_size - 3);
-			map.enemy_y = 0;
+			info.enemy_x = rand() % (info.map_size - 3);
+			info.enemy_y = 1;
 			
 			break;
 		}
 	}
-	
-	
-	
-	
-	
-	
-	
-	
-	
 }
