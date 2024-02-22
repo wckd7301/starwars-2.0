@@ -40,14 +40,14 @@ void spawn_enemy (data& info, int** map);
 
 int main() {
 	
+	srand (time (0));
+	
 	run();
 	
 	return 0;
 }
 
 void run() {
-	
-	srand (time (0));
 	
 	data info;
 	
@@ -285,12 +285,12 @@ int** initialize_game (data& info) {
 
 void run1 (data& info, int** map){
 	
+	if (info.enemy_hp == 0)
+	    spawn_enemy(info, map);
+	
 	render (info, map);
 	
 	move_ship (info, map);
-	
-	if (info.enemy_hp == 0)
-	    spawn_enemy(info, map);
 	
 	run1(info, map);
 	
@@ -366,10 +366,12 @@ void spawn_enemy (data& info, int** map) {
 			info.enemy_name = "Dart";
 			
 			info.enemy_hp = 1;
+			info.enemy_size = 1;
 			
-	//these x and y variables belong to the top left block of the enemy, as previously metioned.
-			info.enemy_y = 1;			
+			info.enemy_x = rand() % info.map_size;					//these x and y variables belong to the top left block of the enemy, as previously metioned.
+			info.enemy_y = 0;			
 			
+			map[info.enemy_x][info.enemy_y] = 2;
 			
 			break;
 		}
@@ -379,9 +381,14 @@ void spawn_enemy (data& info, int** map) {
 			info.enemy_name = "Striker";
 			
 			info.enemy_hp = 2;
-	
+			info.enemy_size = 2;
+			
 			info.enemy_x = rand() % (info.map_size - 1);			//because the size of the ship is 2*2, the left most blocks of the ship need to be off the right edge of the map by at least 1 unit.
-			info.enemy_y = 1;
+			info.enemy_y = 0;
+			
+			for (int i = info.enemy_x; i < info.enemy_size + info.enemy_x; i++ )
+				for (int j = info.enemy_y; j < info.enemy_size + info.enemy_y; j++)
+				    map[i][j] = 2;
 			
 			break;
 		}
@@ -391,9 +398,14 @@ void spawn_enemy (data& info, int** map) {
 			info.enemy_name = "Wraith";
 			
 			info.enemy_hp = 4;
+			info.enemy_size = 3;
 			
 			info.enemy_x = rand() % (info.map_size - 2);
-			info.enemy_y = 1;
+			info.enemy_y = 0;
+			
+			for (int i = info.enemy_x; i < info.enemy_size + info.enemy_x; i++ )
+				for (int j = info.enemy_y; j < info.enemy_size + info.enemy_y; j++)
+				    map[i][j] = 2;
 			
 			break;
 		}
@@ -403,9 +415,14 @@ void spawn_enemy (data& info, int** map) {
 			info.enemy_name = "Banshee";
 			
 			info.enemy_hp = 6;
-	
+			info.enemy_size = 4;
+			
 			info.enemy_x = rand() % (info.map_size - 3);
-			info.enemy_y = 1;
+			info.enemy_y = 0;
+			
+			for (int i = info.enemy_x; i < info.enemy_size + info.enemy_x; i++ )
+				for (int j = info.enemy_y; j < info.enemy_size + info.enemy_y; j++)
+				    map[i][j] = 2;
 			
 			break;
 		}
