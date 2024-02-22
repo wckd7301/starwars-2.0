@@ -8,16 +8,16 @@
 using namespace std;
 
 struct data {
-  
-    int friendly_x;
-    int friendly_y;
+	
 	int friendly_hp;
+	int friendly_x;
+	int friendly_y;
 	
 	string enemy_name;
     int enemy_size;
-    int enemy_x;					//for the top left block of the enemy
-    int enemy_y;					//for the top left block of the enemy
     int enemy_hp;
+    int enemy_x;
+    int enemy_y;
     
     int map_size;
 };
@@ -28,15 +28,15 @@ void  display(int display_code);    //a function which gets a code, and displays
 
 int MainMenu_input();
 
-void render (data& info);
+void render (data& info, int** map);
 
 int** initialize_game (data& info);
 
-void run1 (data& info);
+void run1 (data& info, int** map);
 
-void move_ship (data& info);
+void move_ship (data& info, int** map);
 
-void spawn_enemy (data& info);
+void spawn_enemy (data& info, int** map);
 
 int main() {
 	
@@ -56,7 +56,7 @@ void run() {
 	ship, 2 is for enemy ship and 3 indicates that there is a bullet in the location. */ 
 	int** map = initialize_game (info);
 	
-    run1(info);
+    run1(info, map);
 }
 
 void display (int display_code) {
@@ -216,7 +216,7 @@ int MainMenu_input() {
 }
 
 
-void render (data& info){
+void render (data& info, int** map){
 
 	system ("cls");
 			
@@ -237,12 +237,14 @@ void render (data& info){
                 else if (j % 4 == 1 || j % 4 == 3)
                     cout << ' ';
                 else {
-                    if (((j + 2) / 4) - 1 == info.friendly_x && (i + 1) / 2 == info.friendly_y)
-                        cout << '#';
-                    else if (((j + 1) / 4) == info.enemy_x && (i + 1) / 2 == info.enemy_y)
+                    if (map[(j-2)/4][(i-1)/2]==0)
+						cout << ' ';
+					else if (map[(j-2)/4][(i-1)/2]==1)
+						cout << '#';
+					else if (map[(j-2)/4][(i-1)/2]==2)
 						cout << '*';
-					else 
-                        cout << ' ';			
+					else
+						cout << '^';		
                 }
             }  
         
@@ -268,7 +270,9 @@ int** initialize_game (data& info) {
 		for ( int j = 0; j < info.map_size; j++)
 			map[i][j] = 0;
 			
-			
+	map [info.map_size/2][info.map_size-1] = 1;	//changing the value in bottom middle of the map to 1, indicating the friendly ship.
+	info.friendly_x = info.map_size / 2;
+	info.friendly_y = info.map_size - 1;
 	
 	info.friendly_hp = 3;
 
@@ -279,21 +283,21 @@ int** initialize_game (data& info) {
 	
 	
 
-void run1 (data& info){
+void run1 (data& info, int** map){
 	
-	render (info);
+	render (info, map);
 	
-	move_ship (info);
+	move_ship (info, map);
 	
 	if (info.enemy_hp == 0)
-	    spawn_enemy(info);
+	    spawn_enemy(info, map);
 	
-	run1(info);
+	run1(info, map);
 	
 }
 
 
-void move_ship (data& info) {
+void move_ship (data& info, int** map) {
 	
 	int input; 
 	
@@ -312,27 +316,31 @@ void move_ship (data& info) {
 				break;
 			}
 			
-			case 80: {               //if user presses the down arrow key
+			case 80: {              //if user presses the down arrow key
 				break;
 			}
 			
 			case 75: {              //if user presses the left arrow key
 			
-				if (info.friendly_x == 0)
+				if (map[0][info.map_size - 1] == 1)
 				    break;
 			
-				info.friendly_x --;
+				map[info.friendly_x][info.friendly_y] = 0;
+			    info.friendly_x --;
+			    map[info.friendly_x][info.friendly_y] = 1;
 			    
 				break;
 			}
 		
 			case 77: {              //if user presses the right arrow key 
 				
-				if (info.friendly_x == info.map_size - 1)
+				if (map[info.map_size - 1][info.map_size - 1] == 1)
 				    break;
-				
-				info.friendly_x ++;
-				
+			
+				map[info.friendly_x][info.friendly_y] = 0;
+			    info.friendly_x ++;
+			    map[info.friendly_x][info.friendly_y] = 1;
+			    
 				break;
 			}
 	    }
@@ -347,7 +355,7 @@ void move_ship (data& info) {
 }
 
 
-void spawn_enemy (data& info) {
+void spawn_enemy (data& info, int** map) {
 	
 	info.enemy_size = rand() % 4 + 1;
 	
@@ -359,7 +367,7 @@ void spawn_enemy (data& info) {
 			
 			info.enemy_hp = 1;
 			
-			info.enemy_x = rand() % (info.map_size);		//these x and y variables belong to the top left block of the enemy, as previously metioned.
+	//these x and y variables belong to the top left block of the enemy, as previously metioned.
 			info.enemy_y = 1;			
 			
 			
