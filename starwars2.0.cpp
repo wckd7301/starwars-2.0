@@ -24,19 +24,23 @@ struct data {
 
 void run();
 
-void  display(int display_code);    //a function which gets a code, and displays what needs to be displayed based on that code
+void  display(int display_code);			//a function which gets a code, and displays what needs to be displayed based on that code
 
-int MainMenu_input();
+int MainMenu_input();						//gets the input from main menu (mainly the map size)
 
-void render (data& info, int** map);
+void render (data& info, int** map);		//renders the map
 
-int** initialize_game (data& info);
+int** initialize_game (data& info);			//initializes the game
 
-void run1 (data& info, int** map);
+void run1 (data& info, int** map);			//a recursive version of the run function
 
-void move_ship (data& info, int** map);
+void move_ship (data& info, int** map);		//moves the friendly ship
 
-void spawn_enemy (data& info, int** map);
+void spawn_enemy (data& info, int** map);	//spawns an enemy
+
+void enemy_ship (data& info, int** map);	//does the needed functions on enemy ship, such as moving them, destroying them and etc.
+
+void destroy_enemy (data& info, int** map);	//destroys the enemy
 
 int main() {
 	
@@ -292,6 +296,8 @@ void run1 (data& info, int** map){
 	
 	move_ship (info, map);
 	
+	enemy_ship (info, map);
+	
 	run1(info, map);
 	
 }
@@ -427,4 +433,31 @@ void spawn_enemy (data& info, int** map) {
 			break;
 		}
 	}
+}
+
+void enemy_ship (data& info, int** map) {
+	
+	for (int i = info.enemy_x; i < info.enemy_x + info.enemy_size; i++)		//checks if the enemy ship has had colision with the friendly ship and destroys the enemy ship if it has
+		if (map[i][info.enemy_y + info.enemy_size] == 1)
+			destroy_enemy (info, map);
+	
+	if (info.enemy_y + info.enemy_size == info.map_size)					//checks if the enemy ship has exited the map and destroys it if it has
+			destroy_enemy (info, map);
+			
+	for (int i = info.enemy_x; i < info.enemy_x + info.enemy_size; i++)		//if none of the conditions mentioned above have happened, moves the enemy ship down by one unit	
+		for (int j = info.enemy_y; j < info.enemy_y + info.enemy_size; j++)
+			map[i][j] = 0;
+
+	info.enemy_y ++;
+	
+	for (int i = info.enemy_x; i < info.enemy_x + info.enemy_size; i++)		//if none of the conditions mentioned above have happened, moves the enemy ship down by one unit	
+		for (int j = info.enemy_y; j < info.enemy_y + info.enemy_size; j++)
+			map[i][j] = 2;
+}
+
+void destroy_enemy (data& info, int** map) {
+	
+	
+	
+	
 }
