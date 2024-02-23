@@ -227,6 +227,14 @@ void render (data& info, int** map){
  	int rows = 2 * info.map_size + 1;
     int cols = 4 * info.map_size + 1;
     
+    cout << endl << "Hit points: " << info.friendly_hp;
+	
+	
+	for (int i = 0; i < cols - 32; i++)
+		cout << ' ';
+	
+	cout << "Enemy hit points: " << info.enemy_hp << endl; 
+    
     for (int i = 0; i < rows; i++)	
         for (int j = 0; j < cols; j++){
             if (i % 2 == 0){
