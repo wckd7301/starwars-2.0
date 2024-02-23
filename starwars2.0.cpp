@@ -436,13 +436,14 @@ void spawn_enemy (data& info, int** map) {
 }
 
 void enemy_ship (data& info, int** map) {
-	
-	for (int i = info.enemy_x; i < info.enemy_x + info.enemy_size; i++)		//checks if the enemy ship has had colision with the friendly ship and destroys the enemy ship if it has
-		if (map[i][info.enemy_y + info.enemy_size] == 1)
+
+	if (map [info.friendly_x][info.friendly_y - 1] == 2)
+		destroy_enemy (info, map);
+		
+	else if (info.enemy_y + info.enemy_size == info.map_size)					//checks if the enemy ship has exited the map and destroys it if it has
 			destroy_enemy (info, map);
-	
-	if (info.enemy_y + info.enemy_size == info.map_size)					//checks if the enemy ship has exited the map and destroys it if it has
-			destroy_enemy (info, map);
+
+	else {
 			
 	for (int i = info.enemy_x; i < info.enemy_x + info.enemy_size; i++)		//if none of the conditions mentioned above have happened, moves the enemy ship down by one unit	
 		for (int j = info.enemy_y; j < info.enemy_y + info.enemy_size; j++)
@@ -453,14 +454,10 @@ void enemy_ship (data& info, int** map) {
 	for (int i = info.enemy_x; i < info.enemy_x + info.enemy_size; i++)		//if none of the conditions mentioned above have happened, moves the enemy ship down by one unit	
 		for (int j = info.enemy_y; j < info.enemy_y + info.enemy_size; j++)
 			map[i][j] = 2;
+	}
 }
 
 void destroy_enemy (data& info, int** map) {
-	
-	for (int i = 0; i < info.map_size; i++)
-		for (int j = 0; j < info.map_size; j++)
-			if (map[i][j] == 2)
-				map[i][j] = 0;
 	
 	for (int i = 0; i < info.map_size; i++)
 		for (int j = 0; j < info.map_size; j++)
