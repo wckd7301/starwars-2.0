@@ -52,6 +52,8 @@ void add_bullet (data& info, int** map, bullet* bulletArray);
 
 void remove_bullet (data& info, int** map, bullet* bulletArray);
 
+void move_bullet (data& info, int** map, bullet* bulletArray);
+
 int main() {
 	
 	srand (time (0));
@@ -320,6 +322,8 @@ void run1 (data& info, int** map, bullet* bulletArray){
 	
 	add_bullet (info, map, bulletArray);
 	
+	move_bullet (info, map, bulletArray);
+	
 	enemy_ship (info, map);
 	
 	run1(info, map, bulletArray);
@@ -500,8 +504,7 @@ void add_bullet (data& info, int** map, bullet* bulletArray) {
 	
 	bulletArray[info.bulletCount - 1].y = info.friendly_y - 1;
 	
-	for (int i = 0; i < info.bulletCount; i++)
-		map[bulletArray[i].x][bulletArray[i].y] = 3;
+	map[bulletArray[info.bulletCount - 1].x][bulletArray[info.bulletCount - 1].y] = 3;
 }
 
 
@@ -511,5 +514,18 @@ void remove_bullet (data& info, int** map, bullet* bulletArray) {
 	
 	
 	
+	
+}
+
+void move_bullet (data& info, int** map, bullet* bulletArray) {
+	
+	for (int i = 0; i < info.bulletCount; i++)
+		map[bulletArray[i].x][bulletArray[i].y] = 0;
+	
+	for (int  i = 0; i < info.bulletCount; i++)
+		bulletArray[i].y --;
+	
+	for (int i = 0; i < info.bulletCount; i++)
+		map[bulletArray[i].x][bulletArray[i].y] = 3;
 	
 }
