@@ -19,28 +19,38 @@ struct data {
     int enemy_x;
     int enemy_y;
     
+    int bulletCount; 
     int map_size;
+};
+
+struct bullet {
+	int x;
+	int y;
 };
 
 void run();
 
-void  display(int display_code);			//a function which gets a code, and displays what needs to be displayed based on that code
+void  display(int display_code);													//a function which gets a code, and displays what needs to be displayed based on that code
 
-int MainMenu_input();						//gets the input from main menu (mainly the map size)
+int MainMenu_input();																//gets the input from main menu (mainly the map size)
 
-void render (data& info, int** map);		//renders the map
+void render (data& info, int** map);												//renders the map
 
-int** initialize_game (data& info);			//initializes the game
+int** initialize_game (data& info);													//initializes the game
 
-void run1 (data& info, int** map);			//a recursive version of the run function
+void run1 (data& info, int** map, bullet* bulletArray);			//a recursive version of the run function
 
-void move_ship (data& info, int** map);		//moves the friendly ship
+void move_ship (data& info, int** map);												//moves the friendly ship
 
-void spawn_enemy (data& info, int** map);	//spawns an enemy
+void spawn_enemy (data& info, int** map);											//spawns an enemy
 
-void enemy_ship (data& info, int** map);	//does the needed functions on enemy ship, such as moving them, destroying them and etc.
+void enemy_ship (data& info, int** map);											//does the needed functions on enemy ship, such as moving them, destroying them and etc.
 
-void destroy_enemy (data& info, int** map);	//destroys the enemy
+void destroy_enemy (data& info, int** map);											//destroys the enemy
+
+void add_bullet (data& info, int** map, bullet* bulletArray);
+
+void remove_bullet (data& info, int** map, bullet* bulletArray);
 
 int main() {
 	
@@ -55,12 +65,16 @@ void run() {
 	
 	data info;
 	
+	info.bulletCount = 0;
+	
+	bullet* bulletArray = new bullet [info.bulletCount];
+		
 	/*the 2d array 'map' that has been allocated dynamically, is an array that store one of the 4 values
 	{0, 1, 2, 3} for each coordiantion in the map. 0 indicates that the location is empty, 1 is for friendly 
 	ship, 2 is for enemy ship and 3 indicates that there is a bullet in the location. */ 
 	int** map = initialize_game (info);
 	
-    run1(info, map);
+    run1(info, map, bulletArray);
 }
 
 void display (int display_code) {
@@ -295,7 +309,7 @@ int** initialize_game (data& info) {
 	
 	
 
-void run1 (data& info, int** map){
+void run1 (data& info, int** map, bullet* bulletArray){
 	
 	if (info.enemy_hp == 0)
 	    spawn_enemy(info, map);
@@ -304,9 +318,11 @@ void run1 (data& info, int** map){
 	
 	move_ship (info, map);
 	
+	add_bullet (info, map, bulletArray);
+	
 	enemy_ship (info, map);
 	
-	run1(info, map);
+	run1(info, map, bulletArray);
 	
 }
 
@@ -473,4 +489,27 @@ void destroy_enemy (data& info, int** map) {
 				map[i][j] = 0;
 	
 	info.enemy_hp = 0;		
+}
+
+
+void add_bullet (data& info, int** map, bullet* bulletArray) {
+	
+	info.bulletCount ++;
+	
+	bulletArray[info.bulletCount - 1].x = info.friendly_x;
+	
+	bulletArray[info.bulletCount - 1].y = info.friendly_y - 1;
+	
+	for (int i = 0; i < info.bulletCount; i++)
+		map[bulletArray[i].x][bulletArray[i].y] = 3;
+}
+
+
+void remove_bullet (data& info, int** map, bullet* bulletArray) {
+	
+	
+	
+	
+	
+	
 }
