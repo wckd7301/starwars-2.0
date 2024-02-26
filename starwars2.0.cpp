@@ -4,6 +4,7 @@
 #include <chrono>
 #include <thread>
 #include <ctime>
+#include <vector>
 
 using namespace std;
 
@@ -19,7 +20,6 @@ struct data {
     int enemy_x;
     int enemy_y;
     
-    int bulletCount; 
     int map_size;
 };
 
@@ -38,7 +38,7 @@ void render (data& info, int** map);												//renders the map
 
 int** initialize_game (data& info);													//initializes the game
 
-void run1 (data& info, int** map, bullet* bulletArray);			//a recursive version of the run function
+void run1 (data& info, int** map, vector<bullet>& bulletArray);			//a recursive version of the run function
 
 void move_ship (data& info, int** map);												//moves the friendly ship
 
@@ -48,11 +48,11 @@ void enemy_ship (data& info, int** map);											//does the needed functions o
 
 void destroy_enemy (data& info, int** map);											//destroys the enemy
 
-void add_bullet (data& info, int** map, bullet* bulletArray);
+void add_bullet (data& info, int** map, vector<bullet>& bulletArray);
 
-void remove_bullet (data& info, int** map, bullet* bulletArray);
+void remove_bullet (data& info, int** map, vector<bullet>& bulletArray);
 
-void move_bullet (data& info, int** map, bullet* bulletArray);
+void move_bullet (data& info, int** map, vector<bullet>& bulletArray);
 
 int main() {
 	
@@ -67,15 +67,13 @@ void run() {
 	
 	data info;
 	
-	info.bulletCount = 0;
-	
-	bullet* bulletArray = new bullet [info.bulletCount];
-		
+	vector <bullet> bulletArray;
+
 	/*the 2d array 'map' that has been allocated dynamically, is an array that store one of the 4 values
 	{0, 1, 2, 3} for each coordiantion in the map. 0 indicates that the location is empty, 1 is for friendly 
 	ship, 2 is for enemy ship and 3 indicates that there is a bullet in the location. */ 
 	int** map = initialize_game (info);
-	
+
     run1(info, map, bulletArray);
 }
 
@@ -311,7 +309,7 @@ int** initialize_game (data& info) {
 	
 	
 
-void run1 (data& info, int** map, bullet* bulletArray){
+void run1 (data& info, int** map, vector<bullet>& bulletArray){
 	
 	if (info.enemy_hp == 0)
 	    spawn_enemy(info, map);
@@ -320,9 +318,9 @@ void run1 (data& info, int** map, bullet* bulletArray){
 	
 	move_ship (info, map);
 	
-	add_bullet (info, map, bulletArray);
-	
 	move_bullet (info, map, bulletArray);
+	
+	add_bullet (info, map, bulletArray);
 	
 	enemy_ship (info, map);
 	
@@ -495,17 +493,19 @@ void destroy_enemy (data& info, int** map) {
 	info.enemy_hp = 0;		
 }
 
+void add_bullet(data& info, int** map, vector<bullet>& bulletArray) {
 
-void add_bullet (data& info, int** map, bullet* bulletArray) {
-	
-	info.bulletCount ++;
-	
-	bulletArray[info.bulletCount - 1].x = info.friendly_x;
-	
-	bulletArray[info.bulletCount - 1].y = info.friendly_y - 1;
-	
-	map[bulletArray[info.bulletCount - 1].x][bulletArray[info.bulletCount - 1].y] = 3;
+    bullet newBullet;
+
+    newBullet.x = info.friendly_x;
+
+    newBullet.y = info.friendly_y - 1;
+
+    bulletArray.push_back(newBullet);
+
+    map[newBullet.x][newBullet.y] = 3;
 }
+
 
 
 void remove_bullet (data& info, int** map, bullet* bulletArray) {
@@ -517,15 +517,16 @@ void remove_bullet (data& info, int** map, bullet* bulletArray) {
 	
 }
 
-void move_bullet (data& info, int** map, bullet* bulletArray) {
 	
-	for (int i = 0; i < info.bulletCount; i++)
-		map[bulletArray[i].x][bulletArray[i].y] = 0;
-	
-	for (int  i = 0; i < info.bulletCount; i++)
-		bulletArray[i].y --;
-	
-	for (int i = 0; i < info.bulletCount; i++)
-		map[bulletArray[i].x][bulletArray[i].y] = 3;
-	
+void move_bullet(data& info, int** map, vector<bullet>& bulletArray) {
+
+    for (int i = 0; i < bulletArray.size(); i++)
+        map[bulletArray[i].x][bulletArray[i].y] = 0;
+
+    for (int i = 0; i < bulletArray.size(); i++)
+        bulletArray[i].y--;
+
+    for (int i = 0; i < bulletArray.size(); i++)
+        map[bulletArray[i].x][bulletArray[i].y] = 3;
 }
+
