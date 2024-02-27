@@ -12,6 +12,7 @@ struct data {
 	
 	int friendly_hp;
 	int friendly_x;
+	int friendly_previous_x;
 	int friendly_y;
 	
 	string enemy_name;
@@ -331,6 +332,8 @@ void run1 (data& info, int** map, vector<bullet>& bulletArray){
 
 void move_ship (data& info, int** map) {
 	
+	info.friendly_previous_x = info.friendly_x;
+	
 	int input; 
 	
 	input = getch(); 
@@ -497,7 +500,7 @@ void add_bullet(data& info, int** map, vector<bullet>& bulletArray) {
 
     bullet newBullet;
 
-    newBullet.x = info.friendly_x;
+    newBullet.x = info.friendly_previous_x;
 
     newBullet.y = info.friendly_y - 1;
 
@@ -508,12 +511,9 @@ void add_bullet(data& info, int** map, vector<bullet>& bulletArray) {
 
 
 
-void remove_bullet (data& info, int** map, bullet* bulletArray) {
+void remove_bullet (data& info, int** map, vector<bullet>& bulletArray) {
 	
-	
-	
-	
-	
+
 	
 }
 
