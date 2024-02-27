@@ -55,6 +55,8 @@ void remove_bullet (data& info, int** map, vector<bullet>& bulletArray);
 
 void move_bullet (data& info, int** map, vector<bullet>& bulletArray);
 
+void bullet_colision (data& info, int** map, vector<bullet>& bulletArray);
+
 int main() {
 	
 	srand (time (0));
@@ -327,6 +329,8 @@ void run1 (data& info, int** map, vector<bullet>& bulletArray){
 	
 	enemy_ship (info, map);
 	
+	bullet_colision (info, map, bulletArray);
+	
 	run1(info, map, bulletArray);
 	
 }
@@ -468,11 +472,15 @@ void spawn_enemy (data& info, int** map) {
 
 void enemy_ship (data& info, int** map) {
 
-	if (map [info.friendly_x][info.friendly_y - 1] == 2)
+	if (map [info.friendly_x][info.friendly_y - 1] == 2)	{				//checks if ships have colided with each other and destroys the enemy ship if they have
+		info.enemy_hp = 0; 
 		destroy_enemy (info, map);
+		info.friendly_hp --;}
 		
-	else if (info.enemy_y + info.enemy_size == info.map_size)					//checks if the enemy ship has exited the map and destroys it if it has
-			destroy_enemy (info, map);
+	else if (info.enemy_y + info.enemy_size == info.map_size){				//checks if the enemy ship has exited the map and destroys it if it has
+		info.enemy_hp = 0;
+		info.friendly_hp --;
+		destroy_enemy (info, map);}
 
 	else {
 			
@@ -494,8 +502,7 @@ void destroy_enemy (data& info, int** map) {
 		for (int j = 0; j < info.map_size; j++)
 			if (map[i][j] == 2)
 				map[i][j] = 0;
-	
-	info.enemy_hp = 0;		
+		
 }
 
 void add_bullet(data& info, int** map, vector<bullet>& bulletArray) {
@@ -515,11 +522,18 @@ void add_bullet(data& info, int** map, vector<bullet>& bulletArray) {
 
 void remove_bullet (data& info, int** map, vector<bullet>& bulletArray) {
 	
-    for (int i = 0; i < bulletArray.size(); i++) {
-        if (bulletArray[i].y < 1) {
+    for (int i = 0; i < bulletArray.size(); i++) {				//checks if a bullet has exited the map, swaps it with the last bullet in the vector and removes it using the pop_back function
+        if (bulletArray[i].y < 0) {
             map[bulletArray[i].x][bulletArray[i].y] = 0;
 
-            bulletArray[i] = bulletArray.back();
+            bullet temp;
+            
+            temp = bulletArray[i];
+            
+            bulletArray[i] = bulletArray [bulletArray.size() - 1];
+            
+            bulletArray [bulletArray.size() - 1] = temp;
+            
             bulletArray.pop_back();
 
             break;
@@ -542,3 +556,41 @@ void move_bullet(data& info, int** map, vector<bullet>& bulletArray) {
         map[bulletArray[i].x][bulletArray[i].y] = 3;
 }
 
+
+void bullet_colision (data& info, int** map, vector<bullet>& bulletArray) {
+	
+	for (int i=0; i<bulletArray.size(); i++)
+		if (map[bulletArray[i].x][bulletArray[i].y - 1] == 2 ){
+			
+			map[bulletArray[i].x][bulletArray[i].y] = 0;
+			
+			info.enemy_hp --;
+			
+			bullet temp;
+			
+			temp = bulletArray[i];
+			
+			bulletArray [i] = bulletArray [bulletArray.size() - 1];
+	
+			bulletArray [bulletArray.size() - 1] = temp;	
+			
+			bulletArray.pop_back();
+			
+			if (info.enemy_hp == 0) {
+				destroy_enemy (info, map);
+				render (info, map);
+			}
+			
+		}
+	
+	
+	
+	
+	
+	
+
+	
+		
+	
+
+}
