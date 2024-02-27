@@ -321,6 +321,8 @@ void run1 (data& info, int** map, vector<bullet>& bulletArray){
 	
 	move_bullet (info, map, bulletArray);
 	
+	remove_bullet (info, map, bulletArray);
+	
 	add_bullet (info, map, bulletArray);
 	
 	enemy_ship (info, map);
@@ -513,9 +515,19 @@ void add_bullet(data& info, int** map, vector<bullet>& bulletArray) {
 
 void remove_bullet (data& info, int** map, vector<bullet>& bulletArray) {
 	
+    for (int i = 0; i < bulletArray.size(); i++) {
+        if (bulletArray[i].y < 1) {
+            map[bulletArray[i].x][bulletArray[i].y] = 0;
 
-	
+            bulletArray[i] = bulletArray.back();
+            bulletArray.pop_back();
+
+            break;
+        }
+    }
 }
+
+
 
 	
 void move_bullet(data& info, int** map, vector<bullet>& bulletArray) {
