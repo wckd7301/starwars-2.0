@@ -316,8 +316,6 @@ int** initialize_game (data& info) {
 
 void run1 (data& info, int** map, vector<bullet>& bulletArray){
 	
-	i f==
-	
 	if (info.enemy_hp == 0)
 	    spawn_enemy(info, map);
 	
@@ -566,7 +564,8 @@ void move_bullet(data& info, int** map, vector<bullet>& bulletArray) {
 void bullet_colision (data& info, int** map, vector<bullet>& bulletArray) {
 	
 	for (int i=0; i<bulletArray.size(); i++)
-		if (map[bulletArray[i].x][bulletArray[i].y - 1] == 2 || map[bulletArray[i].x][bulletArray[i].y] == 2){
+		
+		if (map[bulletArray[i].x][bulletArray[i].y] == 2){
 			
 			info.enemy_hp --;
 			
