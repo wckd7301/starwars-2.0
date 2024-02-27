@@ -57,7 +57,7 @@ void move_bullet (data& info, int** map, vector<bullet>& bulletArray);
 
 void bullet_colision (data& info, int** map, vector<bullet>& bulletArray);
 
-void update_bullet (data& info, int** map, vector<bullet>& bulletArray);
+void update (data& info, int** map, vector<bullet>& bulletArray);
 
 int main() {
 	
@@ -565,7 +565,9 @@ void bullet_colision (data& info, int** map, vector<bullet>& bulletArray) {
 	
 	for (int i=0; i<bulletArray.size(); i++)
 		
-		if (map[bulletArray[i].x][bulletArray[i].y] == 2){
+		/*the reason why it checks two diffrent conditions is that when any key is pressed, two things happen: 1. enemy ship moves and 2. the bullets move.
+		so there is a possibility that if the enemy ship is Dart, the bullet goes through the enemy ship without effectiong it. this fixes it.*/ 
+		if (map[bulletArray[i].x][bulletArray[i].y - 1] == 2 || map[bulletArray[i].x][bulletArray[i].y] == 2){
 			
 			info.enemy_hp --;
 			
@@ -579,11 +581,19 @@ void bullet_colision (data& info, int** map, vector<bullet>& bulletArray) {
 			
 			bulletArray.pop_back();
 			
-			update_bullet (info, map, bulletArray);
+			update (info, map, bulletArray);
 			
-			if (info.enemy_hp == 0) {
+			if (info.enemy_hp <= 0) {
 				destroy_enemy (info, map);
 				render (info, map);
+			}
+			
+			if (map[info.friendly_x][info.friendly_y-1]==2){
+				info.enemy_hp = 0;
+				destroy_enemy (info, map);
+				render (info, map);
+			
+			
 			}
 			
 		}
@@ -592,7 +602,7 @@ void bullet_colision (data& info, int** map, vector<bullet>& bulletArray) {
 
 
 
-void update_bullet (data& info, int** map, vector<bullet>& bulletArray) {
+void update (data& info, int** map, vector<bullet>& bulletArray) {
 
 	for (int i =0; i < info.map_size; i++)
 		for (int j = 0; j < info.map_size; j++)
@@ -606,6 +616,11 @@ void update_bullet (data& info, int** map, vector<bullet>& bulletArray) {
 		for (int j = info.enemy_y; j < info.enemy_size + info.enemy_y; j++)	
 			map[i][j] = 2;
 
-
+	for (int i=0; i<info.map_size; i++)
+		for (int j=0; j<info.map_size; j++)
+			if (map[i][j] == 1)
+				map[i][j] = 0;
+	
+	map[info.friendly_x][info.friendly_y] = 1;
 
 }
