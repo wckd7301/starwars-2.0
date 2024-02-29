@@ -321,7 +321,6 @@ void run1 (data& info, int** map, vector<bullet>& bulletArray){
 	
 	render (info, map);
 	
-	bullet_colision (info, map, bulletArray);
 	
 	move_ship (info, map);
 	
@@ -330,6 +329,7 @@ void run1 (data& info, int** map, vector<bullet>& bulletArray){
 	remove_bullet (info, map, bulletArray);
 	
 	add_bullet (info, map, bulletArray);
+	bullet_colision (info, map, bulletArray);
 	
 	enemy_ship (info, map);
 	
@@ -567,7 +567,7 @@ void bullet_colision (data& info, int** map, vector<bullet>& bulletArray) {
 		
 		/*the reason why it checks two diffrent conditions is that when any key is pressed, two things happen: 1. enemy ship moves and 2. the bullets move.
 		so there is a possibility that if the enemy ship is Dart, the bullet goes through the enemy ship without effectiong it. this fixes it.*/ 
-		if (map[bulletArray[i].x][bulletArray[i].y - 1] == 2 || map[bulletArray[i].x][bulletArray[i].y] == 2){
+		if (/*map[bulletArray[i].x][bulletArray[i].y - 1] == 2 ||*/ map[bulletArray[i].x][bulletArray[i].y] == 2){
 			
 			info.enemy_hp --;
 			
