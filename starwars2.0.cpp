@@ -54,7 +54,7 @@ void infiniteContinue (data& info, int** map, vector<bullet>& bulletVector);
 void display (int display_code);
 void setWinningScore (data& info);
 void render (data& info, int** map);
-int** initializeGame (data& info);
+int** initializeGame (data& info, vector<bullet>& bulletVector);
 void moveFriendlyShip (data& info, int** map);
 void moveEnemyShip (data& info, int** map);
 void spawnEnemy (data& info, int** map, vector<bullet>& bulletVector);
@@ -68,6 +68,7 @@ void win (data& info, int** map, vector<bullet>& bulletVector);
 void lose (data& info);
 void secondaryMenu (data& info,int** map);
 void saveGame (data& info, int** map, vector<bullet>& bulletVector);
+void continueGame (data& info, vector<bullet>& bulletVector);
 
 int main () {
 	
@@ -85,7 +86,7 @@ void run () {
 	/*the 2d array 'map' that has been allocated dynamically, is an array that store one of the 4 values
 	{0, 1, 2, 3} for each coordiantion in the map. 0 indicates that the location is empty, 1 is for friendly 
 	ship, 2 is for enemy ship and 3 indicates that there is a bullet in the location. */ 
-	int** map = initializeGame (info);
+	int** map = initializeGame (info, bulletVector);
 	
 	setWinningScore (info);
 	
@@ -95,6 +96,8 @@ void run () {
 void run1 (data& info, int** map, vector<bullet>& bulletVector) {
 	
 	saveGame (info, map, bulletVector);
+	
+	render (info, map);
 	
 	moveBullets (info, map, bulletVector);
 		
@@ -148,7 +151,7 @@ void run1 (data& info, int** map, vector<bullet>& bulletVector) {
 void infiniteContinue (data& info, int** map, vector<bullet>& bulletVector) {
 
 	saveGame (info, map, bulletVector);
-
+render (info, map);
 	moveBullets (info, map, bulletVector);
 		
 	bulletColision (info, map, bulletVector);
@@ -189,7 +192,7 @@ void infiniteContinue (data& info, int** map, vector<bullet>& bulletVector) {
 	infiniteContinue (info, map, bulletVector);
 }
 
-int** initializeGame (data& info) {
+int** initializeGame (data& info, vector<bullet>& bulletVector) {
 	
 	bool flag = false;
 	
@@ -261,6 +264,9 @@ int** initializeGame (data& info) {
 		    }
 		
 		    case '2': {
+			   
+			   continueGame (info, bulletVector);
+			   
 			    break;
 		    }
 		
@@ -1008,6 +1014,8 @@ void lose (data& info) {
 	
 	display (9);
 	
+	remove ("document.txt");
+	
 	cout << "\nPress any key to exit ...";
 	
 	_getch ();
@@ -1048,7 +1056,9 @@ void secondaryMenu (data& info,int** map) {
 		
 		case '4': {
 			
+			remove ("document.txt");
 			
+			exit (0);
 			
 			break;
 		}
@@ -1065,7 +1075,7 @@ void secondaryMenu (data& info,int** map) {
 
 void saveGame (data& info, int** map, vector<bullet>& bulletVector) {
 	
-	ofstream FILE ("documet.txt");
+	ofstream FILE ("document.txt");
 	
 	FILE << info.friendly_hp << " " << info.friendly_x << " " << info.friendly_previous_x << " " << info.friendly_y << " " << info.enemy_name << " " << info.enemy_size << " " << info.enemy_hp << " " << info.enemy_x << " " << info.enemy_y << " " << info.score << " " << info.winningScore << " " << info.map_size;
 	
@@ -1083,4 +1093,47 @@ void saveGame (data& info, int** map, vector<bullet>& bulletVector) {
 	
 	for (int i = 0; i<bulletVector.size(); i++)
 		FILE << bulletVector[i].x << " " << bulletVector[i].y << " ";	
+}
+
+
+void continueGame (data& info, vector<bullet>& bulletVector) {	
+		
+	ifstream FILE ("document.txt");
+	
+	FILE >> info.friendly_hp >> info.friendly_x >> info.friendly_previous_x >> info.friendly_y >> info.enemy_name >> info.enemy_size >> info.enemy_hp >> info.enemy_x >> info.enemy_y >> info.score >> info.winningScore >> info.map_size;
+	
+	int** map = new int*[info.map_size];		//dynamically allocating memory for all the rows of the map combined.
+	
+	for (int i = 0; i < info.map_size; i++)		//dynamically allocating memory for every single row of the map.
+		map[i] = new int[info.map_size];
+	
+	for (int i = 0; i < info.map_size; i++)		//setting all the values to 0, meaning that in the start of the game, we have a completely empty map.
+		for ( int j = 0; j < info.map_size; j++)
+			map[i][j] = 0;
+	
+	for (int i = 0; i < info.map_size; i++) {
+		for (int j = 0; j < info.map_size; j++){
+			FILE >> map[i][j];
+		}
+	}
+		
+	int size;
+		
+	FILE >> size;	
+	
+	for (int i = 0; i<size; i++) {
+		
+		bullet newBullet;
+		
+		FILE >> newBullet.x >> newBullet.y;	
+	
+		bulletVector.push_back(newBullet);}
+		
+	
+		
+			if (info.score >= info.winningScore)
+				infiniteContinue (info, map, bulletVector);
+			else 
+				run1 (info, map, bulletVector);
+			
 }
