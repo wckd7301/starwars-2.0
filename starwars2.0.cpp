@@ -6,6 +6,7 @@
 #include <ctime>
 #include <vector>
 #include <iomanip>
+#include <fstream>
 
 #define reset "\033[0m"                     //defining the ANSI color codes.
 #define red "\033[31m"
@@ -66,6 +67,7 @@ void bulletColision (data& info, int** map, vector<bullet>& bulletVector);
 void win (data& info, int** map, vector<bullet>& bulletVector);
 void lose (data& info);
 void secondaryMenu (data& info,int** map);
+void saveGame (data& info, int** map, vector<bullet>& bulletVector);
 
 int main () {
 	
@@ -91,6 +93,8 @@ void run () {
 }
 
 void run1 (data& info, int** map, vector<bullet>& bulletVector) {
+	
+	saveGame (info, map, bulletVector);
 	
 	moveBullets (info, map, bulletVector);
 		
@@ -142,6 +146,8 @@ void run1 (data& info, int** map, vector<bullet>& bulletVector) {
 }
 
 void infiniteContinue (data& info, int** map, vector<bullet>& bulletVector) {
+
+	saveGame (info, map, bulletVector);
 
 	moveBullets (info, map, bulletVector);
 		
@@ -1054,4 +1060,27 @@ void secondaryMenu (data& info,int** map) {
 			break;
 		}
 	}
+}
+
+
+void saveGame (data& info, int** map, vector<bullet>& bulletVector) {
+	
+	ofstream FILE ("documet.txt");
+	
+	FILE << info.friendly_hp << " " << info.friendly_x << " " << info.friendly_previous_x << " " << info.friendly_y << " " << info.enemy_name << " " << info.enemy_size << " " << info.enemy_hp << " " << info.enemy_x << " " << info.enemy_y << " " << info.score << " " << info.winningScore << " " << info.map_size;
+	
+	FILE << endl; 
+	
+	for (int i = 0; i < info.map_size; i++) {
+		for (int j = 0; j < info.map_size; j++){
+			FILE << map[i][j] << " ";
+			if (j==info.map_size - 1)
+			FILE << endl;
+		}
+	}
+		
+	FILE << bulletVector.size() << endl;	
+	
+	for (int i = 0; i<bulletVector.size(); i++)
+		FILE << bulletVector[i].x << " " << bulletVector[i].y << " ";	
 }
