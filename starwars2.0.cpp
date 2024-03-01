@@ -7,6 +7,21 @@
 #include <vector>
 #include <iomanip>
 
+#define reset "\033[0m"                     //defining the ANSI color codes.
+#define red "\033[31m"
+#define green "\033[32m"
+#define yellow "\033[33m"
+#define blue "\033[34m"
+#define magenta "\033[35m"
+#define cyan "\033[36m"
+#define white "\033[37m"
+#define bright_red "\033[91m"
+#define bright_green "\033[92m"
+#define bright_yellow "\033[93m"
+#define bright_blue "\033[94m"
+#define bright_magenta "\033[95m"
+#define bright_cyan "\033[96m"
+
 using namespace std;
 
 struct data {	
@@ -50,6 +65,7 @@ void shipColision (data& info, int** map);
 void bulletColision (data& info, int** map, vector<bullet>& bulletVector);
 void win (data& info, int** map, vector<bullet>& bulletVector);
 void lose (data& info);
+void secondaryMenu (data& info,int** map);
 
 int main () {
 	
@@ -86,7 +102,11 @@ void run1 (data& info, int** map, vector<bullet>& bulletVector) {
 	if (info.enemy_hp == 0)
 	    spawnEnemy(info, map, bulletVector);
 	
-	render (info, map);
+	if (info.score >= info.winningScore)	
+		win (info, map, bulletVector);
+		
+	if (info.friendly_hp <= 0 ) 
+		lose (info);	
 		
 	moveFriendlyShip (info, map);
 		
@@ -96,13 +116,12 @@ void run1 (data& info, int** map, vector<bullet>& bulletVector) {
 		render (info, map);
 		
 	addBullet (info, map, bulletVector);
-		
+	
+	render (info, map);
+	
 	bulletColision (info, map, bulletVector);
 		
 	moveEnemyShip (info, map);
-		
-	if (info.enemy_hp > 0)
-		render (info, map);
 		
 	bulletColision (info, map, bulletVector);
 		
@@ -133,9 +152,7 @@ void infiniteContinue (data& info, int** map, vector<bullet>& bulletVector) {
 	
 	if (info.enemy_hp == 0)
 	    spawnEnemy(info, map, bulletVector);
-	
-	render (info, map);
-		
+			
 	moveFriendlyShip (info, map);
 		
 	shipColision (info, map);
@@ -145,12 +162,11 @@ void infiniteContinue (data& info, int** map, vector<bullet>& bulletVector) {
 		
 	addBullet (info, map, bulletVector);
 		
+	render (info, map);
+		
 	bulletColision (info, map, bulletVector);
 		
 	moveEnemyShip (info, map);
-		
-	if (info.enemy_hp > 0)
-		render (info, map);
 		
 	bulletColision (info, map, bulletVector);
 		
@@ -169,7 +185,9 @@ void infiniteContinue (data& info, int** map, vector<bullet>& bulletVector) {
 
 int** initializeGame (data& info) {
 	
-	while(true){
+	bool flag = false;
+	
+	while(flag == false){
 		
 		display (0);
 		
@@ -189,16 +207,19 @@ int** initializeGame (data& info) {
 			    	
 			    	case '1': {
 						info.map_size = 15;
+						flag = true;
 						break;
 					}
 			    	
 			    	case '2': {
 						info.map_size = 17;
+						flag = true;
 						break;
 					}
 			    	
 			    	case '3': {
 						info.map_size = 19;
+						flag = true;
 						break;
 					}
 					
@@ -219,10 +240,11 @@ int** initializeGame (data& info) {
 								display (4);
 						    
 							    info.map_size = map_size + 1;	
-						    	
+						    	flag = true;
 							}
 							else
 							    info.map_size = map_size;
+								flag = true;
 								break;
 					
 					    }
@@ -237,6 +259,9 @@ int** initializeGame (data& info) {
 		    }
 		
 		    case '3': {
+			   
+			   display (10);
+			   
 			    break;
 		    }
 		
@@ -252,7 +277,6 @@ int** initializeGame (data& info) {
 		    }
 			
 	    } 
-		break;
     }
 	
 	int** map = new int*[info.map_size];		//dynamically allocating memory for all the rows of the map combined.
@@ -367,15 +391,211 @@ void display (int display_code) {
 	
 		case 8: {
 			
-			
-			
-			
-			
-			
+			for (int i=0; i<20; i++){
+
+				int randomColorCode = rand() %	13;
+
+				switch (randomColorCode) {
+	
+					case 0  :{
+					    system ("CLS");	
+						cout << red << "Congratulations! You win!";
+						this_thread::sleep_for(chrono::milliseconds(100));	
+						break;
+					}
+	
+					case 1  :{
+						system ("CLS");	
+						cout << green << "Congratulations! You win!";
+						this_thread::sleep_for(chrono::milliseconds(100));	
+						break;
+					}
+	
+					case 2  :{
+						system ("CLS");	
+						cout << yellow << "Congratulations! You win!";
+						this_thread::sleep_for(chrono::milliseconds(100));	
+						break;
+					}
+	
+					case 3  :{
+						system ("CLS");	
+						cout << blue << "Congratulations! You win!";
+						this_thread::sleep_for(chrono::milliseconds(100));	
+						break;
+					}
+	
+					case 4  :{
+						system ("CLS");	
+						cout << magenta << "Congratulations! You win!";
+						this_thread::sleep_for(chrono::milliseconds(100));	
+						break;
+					}
+	
+					case 5  :{
+						system ("CLS");	
+						cout << cyan << "Congratulations! You win!";
+						this_thread::sleep_for(chrono::milliseconds(100));	
+						break;
+					}
+	
+					case 6  :{
+						system ("CLS");	
+						cout << bright_red << "Congratulations! You win!";
+						this_thread::sleep_for(chrono::milliseconds(100));	
+						break;
+					}
+	
+					case 7  :{
+						system ("CLS");	
+						cout << white << "Congratulations! You win!";
+						this_thread::sleep_for(chrono::milliseconds(100));	
+						break;
+					}
+	
+					case 8  :{
+						system ("CLS");	
+						cout << bright_blue << "Congratulations! You win!";
+						this_thread::sleep_for(chrono::milliseconds(100));
+						break;
+					}
+	
+					case 9  :{
+						system ("CLS");	
+						cout << bright_yellow << "Congratulations! You win!";
+						this_thread::sleep_for(chrono::milliseconds(100));	
+						break;
+					}
+	
+					case 10 :{
+						system ("CLS");	
+						cout << bright_green << "Congratulations! You win!";
+						this_thread::sleep_for(chrono::milliseconds(100));	
+						break;
+					}
+	
+					case 11 :{
+						system ("CLS");	
+						cout << bright_cyan << "Congratulations! You win!";
+						this_thread::sleep_for(chrono::milliseconds(100));	
+						break;
+					}
+	
+					case 12 :{
+						system ("CLS");	
+						cout << bright_magenta << "Congratulations! You win!";
+						this_thread::sleep_for(chrono::milliseconds(100));	
+						break;
+					}
+				}	
+			}
+	
+			cout << reset << endl << "Do you wish to continue? (y/n)";
+		
 			break;
 		}	
 	
+		case 9:{
+			
+			system("CLS");
 	
+			for (int i=0; i<5; i++){
+				cout << red << "Game over!";
+			    this_thread::sleep_for(chrono::milliseconds(500));
+    		    system ("CLS");	
+	    		this_thread::sleep_for(chrono::milliseconds(500));
+        	
+			}
+	
+			cout << red << "Game over!" << reset;
+	
+			break;
+		}
+	
+		case 10 :{
+			
+			system ("cls");
+			
+			cout << "Hi there . . .";
+			
+			this_thread::sleep_for(chrono::milliseconds(2000));
+			
+			system ("cls");
+			
+			cout << "Welcome to Star Wars 2 . . .";
+			
+			this_thread::sleep_for(chrono::milliseconds(2000));
+			
+			system ("cls");
+			
+			cout << "You will be put in the bottom of a map.";
+			
+			this_thread::sleep_for(chrono::milliseconds(300));
+			
+			cout << "\nThe size of the map is yours to pick.";
+			
+			this_thread::sleep_for(chrono::milliseconds(300));
+			
+			cout << "\nFirst, you will need to set a winning score, a target or goal of you will ...";
+			
+			this_thread::sleep_for(chrono::milliseconds(300));
+			
+			cout << "\nThen, you have to reach to the target before losing all of your hit points.";
+			
+			this_thread::sleep_for(chrono::milliseconds(300));
+			
+			cout << "\nDiffrent enemies will spawn at the top of the map, and you need to eliminate them before they reach you or the bottom of the map.";
+			
+			this_thread::sleep_for(chrono::milliseconds(300));
+			
+			cout << "\nYou can use arrow keys to move, each move will trigger the guns to shoot a bullet, you can press the down arrow key to shoot while staying still.";
+			
+			this_thread::sleep_for(chrono::milliseconds(300));
+			
+			cout << "\nAt each stage of the game, the game will be automatically saved. You can comeback and continue your game any time!";
+			
+			this_thread::sleep_for(chrono::milliseconds(300));
+			
+			cout << "\n\nPress any key to return to the main menu . . .";
+			
+			_getch ();
+			
+			break;
+		}
+	
+		case 11: {
+			
+			system ("cls");
+			
+			cout << "1. Resume\n2. Instructions\n3. Save and exit\n4. Exit without saving";
+			
+			break;
+		}
+
+		case 12: {
+			
+			system ("cls");
+			
+			this_thread::sleep_for(chrono::milliseconds(300));
+			
+			cout << "\nDiffrent enemies will spawn at the top of the map, and you need to eliminate them before they reach you or the bottom of the map.";
+			
+			this_thread::sleep_for(chrono::milliseconds(300));
+			
+			cout << "\nYou can use arrow keys to move, each move will trigger the guns to shoot a bullet, you can press the down arrow key to shoot while staying still.";
+			
+			this_thread::sleep_for(chrono::milliseconds(300));
+			
+			cout << "\nAt each stage of the game, the game will be automatically saved. You can comeback and continue your game any time!";
+			
+			this_thread::sleep_for(chrono::milliseconds(300));
+			
+			cout << "\n\nPress any key to continue . . .";
+			
+			_getch ();
+			
+			break;
+		}
 	}
 
 }
@@ -524,18 +744,18 @@ void render (data& info, int** map) {
                     if (map[(j-2)/4][(i-1)/2]==0)
 						cout << ' ';
 					else if (map[(j-2)/4][(i-1)/2]==1)
-						cout << '#';
+						cout << blue << '#' << reset;
 					else if (map[(j-2)/4][(i-1)/2]==2)
-						cout << '*';
+						cout << red <<'*' << reset;
 					else
-						cout << '^';		
+						cout << yellow << '^' << reset;		
                 }
             }  
         
             if (j == cols - 1)
                 cout << endl;
         }			
-			
+		cout << "\nPress esc to access the menu";
 }
 
 
@@ -605,8 +825,8 @@ bool flag = false;
 	    }
 	}
 	
-	else if (input == 27){		   //if the esc key gets pressed
-	    cout << "esc";
+	else if (input == 27){		   //if the esc key gets pressed (to open the menu while in the game)
+	    secondaryMenu (info, map);
 	    cin.ignore();
 	    flag = true;
 	}
@@ -621,6 +841,7 @@ void shipColision (data& info, int** map) {
 	if (map[info.friendly_x][info.friendly_y - 1] == 2){
 		destroyEnemy (info, map);
 		info.friendly_hp --;
+		render (info, map);
 	}
 	
 }
@@ -682,22 +903,22 @@ void bulletColision (data& info, int** map, vector<bullet>& bulletVector) {
 	
 void moveEnemyShip(data& info, int** map) {
     if (info.enemy_y + info.enemy_size == info.map_size) {
-        // Enemy ship has exited the map
+        //enemy ship has exited the map
         info.enemy_hp = 0;
         info.friendly_hp--;
         destroyEnemy(info, map);
         render(info, map);
     } else {
-        // Remove the enemy ship from its current position
+        //remove the enemy ship from its current position
         for (int i = info.enemy_x; i < info.enemy_x + info.enemy_size; i++)
             for (int j = info.enemy_y; j < info.enemy_y + info.enemy_size; j++)
                 if (i >= 0 && i < info.map_size && j >= 0 && j < info.map_size)
                     map[i][j] = 0;
 
-        // Move the enemy ship down by one unit
+        //move the enemy ship down by one unit
         info.enemy_y++;
 
-        // Place the enemy ship in its new position
+        //place the enemy ship in its new position
         for (int i = info.enemy_x; i < info.enemy_x + info.enemy_size; i++)
             for (int j = info.enemy_y; j < info.enemy_y + info.enemy_size; j++)
                 if (i >= 0 && i < info.map_size && j >= 0 && j < info.map_size)
@@ -744,13 +965,13 @@ void removeOutOfTheMapBullets (data& info, int** map, vector<bullet>& bulletVect
 
 void win (data& info, int** map, vector<bullet>& bulletVector) {
 	
-	cout << "win";
-	
-	cout << "continue ? y/n";
+	display (8);
 	
 	char input;
 	
-	input = getch();
+	while (true){
+	
+	cin >> input;
 	
 	switch (input) {
 		
@@ -765,34 +986,72 @@ void win (data& info, int** map, vector<bullet>& bulletVector) {
 		case 'n' :{
 			
 			exit (0);
-			
-			
-			
+					
 			break;
 		}	
 		
 		
 		default : {
-			display (5);
 			break;
 		}		
-		
-		
-		
-		
-		
-		
-		
 	}
-
+}
 }
 
 void lose (data& info) {
 	
-	cout << "lose";
+	display (9);
+	
+	cout << "\nPress any key to exit ...";
 	
 	_getch ();
 	
 	exit (0);
 	
+}
+
+
+
+void secondaryMenu (data& info,int** map) {
+	
+	display (11);
+	
+	char input;
+	
+	input = getch ();
+	
+	switch (input) {
+		
+		case '1':{
+			break;
+		}
+		
+		case '2':{
+			
+			display (12);
+			
+			break;
+		}
+		
+		case '3': {
+			
+			exit (0);
+			
+			break;
+		}
+		
+		case '4': {
+			
+			
+			
+			break;
+		}
+	
+		default :{
+			
+			secondaryMenu (info, map);
+		
+			break;
+		}
+	}
 }
