@@ -5,11 +5,11 @@
 #include <thread>
 #include <ctime>
 #include <vector>
+#include <iomanip>
 
 using namespace std;
 
-struct data {
-	
+struct data {	
 	int friendly_hp;
 	int friendly_x;
 	int friendly_previous_x;
@@ -21,6 +21,9 @@ struct data {
     int enemy_x;
     int enemy_y;
     
+    int score;
+    int winningScore;
+    
     int map_size;
 };
 
@@ -29,58 +32,250 @@ struct bullet {
 	int y;
 };
 
-void run();
+void run ();
+void run1 (data& info, int** map, vector<bullet>& bulletVector);
+void infiniteContinue (data& info, int** map, vector<bullet>& bulletVector);
+void display (int display_code);
+void setWinningScore (data& info);
+void render (data& info, int** map);
+int** initializeGame (data& info);
+void moveFriendlyShip (data& info, int** map);
+void moveEnemyShip (data& info, int** map);
+void spawnEnemy (data& info, int** map, vector<bullet>& bulletVector);
+void destroyEnemy (data& info, int** map);
+void addBullet (data& info, int** map, vector<bullet>& bulletVector);
+void moveBullets (data& info, int** map, vector<bullet>& bulletVector);
+void removeOutOfTheMapBullets (data& info, int** map, vector<bullet>& bulletVector);
+void shipColision (data& info, int** map);
+void bulletColision (data& info, int** map, vector<bullet>& bulletVector);
+void win (data& info, int** map, vector<bullet>& bulletVector);
+void lose (data& info);
 
-void  display(int display_code);													//a function which gets a code, and displays what needs to be displayed based on that code
-
-int MainMenu_input();																//gets the input from main menu (mainly the map size)
-
-void render (data& info, int** map);												//renders the map
-
-int** initialize_game (data& info);													//initializes the game
-
-void run1 (data& info, int** map, vector<bullet>& bulletArray);			//a recursive version of the run function
-
-void move_ship (data& info, int** map);												//moves the friendly ship
-
-void spawn_enemy (data& info, int** map);											//spawns an enemy
-
-void enemy_ship (data& info, int** map);											//does the needed functions on enemy ship, such as moving them, destroying them and etc.
-
-void destroy_enemy (data& info, int** map);											//destroys the enemy
-
-void add_bullet (data& info, int** map, vector<bullet>& bulletArray);
-
-void remove_bullet (data& info, int** map, vector<bullet>& bulletArray);
-
-void move_bullet (data& info, int** map, vector<bullet>& bulletArray);
-
-void bullet_colision (data& info, int** map, vector<bullet>& bulletArray);
-
-void update (data& info, int** map, vector<bullet>& bulletArray);
-
-int main() {
+int main () {
 	
 	srand (time (0));
 	
 	run();
-	
-	return 0;
 }
 
-void run() {
+void run () {
 	
 	data info;
 	
-	vector <bullet> bulletArray;
-
+	vector<bullet> bulletVector;
+	
 	/*the 2d array 'map' that has been allocated dynamically, is an array that store one of the 4 values
 	{0, 1, 2, 3} for each coordiantion in the map. 0 indicates that the location is empty, 1 is for friendly 
 	ship, 2 is for enemy ship and 3 indicates that there is a bullet in the location. */ 
-	int** map = initialize_game (info);
-
-    run1(info, map, bulletArray);
+	int** map = initializeGame (info);
+	
+	setWinningScore (info);
+	
+	run1 (info, map, bulletVector);
 }
+
+void run1 (data& info, int** map, vector<bullet>& bulletVector) {
+	
+	moveBullets (info, map, bulletVector);
+		
+	bulletColision (info, map, bulletVector);
+		
+	if (info.enemy_hp == 0)
+		render (info, map);
+	
+	if (info.enemy_hp == 0)
+	    spawnEnemy(info, map, bulletVector);
+	
+	render (info, map);
+		
+	moveFriendlyShip (info, map);
+		
+	shipColision (info, map);
+		
+	if (info.enemy_hp == 0)
+		render (info, map);
+		
+	addBullet (info, map, bulletVector);
+		
+	bulletColision (info, map, bulletVector);
+		
+	moveEnemyShip (info, map);
+		
+	if (info.enemy_hp > 0)
+		render (info, map);
+		
+	bulletColision (info, map, bulletVector);
+		
+	shipColision (info, map);
+		
+	if (info.enemy_hp != 0)
+		bulletColision (info, map, bulletVector);
+		
+	removeOutOfTheMapBullets (info, map, bulletVector);	
+		
+	if (info.score >= info.winningScore)	
+		win (info, map, bulletVector);
+		
+	if (info.friendly_hp <= 0 ) 
+		lose (info);
+			
+	run1 (info, map, bulletVector);
+}
+
+void infiniteContinue (data& info, int** map, vector<bullet>& bulletVector) {
+
+	moveBullets (info, map, bulletVector);
+		
+	bulletColision (info, map, bulletVector);
+		
+	if (info.enemy_hp == 0)
+		render (info, map);
+	
+	if (info.enemy_hp == 0)
+	    spawnEnemy(info, map, bulletVector);
+	
+	render (info, map);
+		
+	moveFriendlyShip (info, map);
+		
+	shipColision (info, map);
+		
+	if (info.enemy_hp == 0)
+		render (info, map);
+		
+	addBullet (info, map, bulletVector);
+		
+	bulletColision (info, map, bulletVector);
+		
+	moveEnemyShip (info, map);
+		
+	if (info.enemy_hp > 0)
+		render (info, map);
+		
+	bulletColision (info, map, bulletVector);
+		
+	shipColision (info, map);
+		
+	if (info.enemy_hp != 0)
+		bulletColision (info, map, bulletVector);
+		
+	removeOutOfTheMapBullets (info, map, bulletVector);	
+		
+	if (info.friendly_hp <= 0 ) 
+		lose (info);	
+		
+	infiniteContinue (info, map, bulletVector);
+}
+
+int** initializeGame (data& info) {
+	
+	while(true){
+		
+		display (0);
+		
+	    char menu_input;
+	    menu_input = getch(); 
+	
+	    switch (menu_input){
+		
+		    case '1': {
+			
+			    display  (1);
+			    
+			    char map_size_input;
+			    map_size_input = getch();
+			    
+			    switch (map_size_input){
+			    	
+			    	case '1': {
+						info.map_size = 15;
+						break;
+					}
+			    	
+			    	case '2': {
+						info.map_size = 17;
+						break;
+					}
+			    	
+			    	case '3': {
+						info.map_size = 19;
+						break;
+					}
+					
+					case '4': {
+						
+						while (true){
+						
+						    display (2);
+						
+						    int map_size;
+						    cin >> map_size;
+						    
+						    if (map_size < 15)
+						        display (3);
+						    
+							else if (map_size % 2 == 0){
+						    
+								display (4);
+						    
+							    info.map_size = map_size + 1;	
+						    	
+							}
+							else
+							    info.map_size = map_size;
+								break;
+					
+					    }
+					}
+				}
+			
+			    break;
+		    }
+		
+		    case '2': {
+			    break;
+		    }
+		
+		    case '3': {
+			    break;
+		    }
+		
+		    case '4': {
+			    exit(0);
+		    }
+		
+		    default: {
+			   
+			   display (5);
+			   
+			    break;
+		    }
+			
+	    } 
+		break;
+    }
+	
+	int** map = new int*[info.map_size];		//dynamically allocating memory for all the rows of the map combined.
+	
+	for (int i = 0; i < info.map_size; i++)		//dynamically allocating memory for every single row of the map.
+		map[i] = new int[info.map_size];
+	
+	for (int i = 0; i < info.map_size; i++)		//setting all the values to 0, meaning that in the start of the game, we have a completely empty map.
+		for ( int j = 0; j < info.map_size; j++)
+			map[i][j] = 0;
+			
+	map [info.map_size/2][info.map_size-1] = 1;	//changing the value in bottom middle of the map to 1, indicating the friendly ship.
+	info.friendly_x = info.map_size / 2;
+	info.friendly_y = info.map_size - 1;
+	
+	info.score = 0;
+	info.friendly_hp = 3;
+
+	info.enemy_hp = 0;            	            //making the enemy's hitpoints 0 in the start of the game so the run1 function spawns an enemy using the spawn_enemy function
+	
+	return map;
+}
+
 
 void display (int display_code) {
 	
@@ -92,7 +287,7 @@ void display (int display_code) {
 			
 			cout << "---------------------------------\n|           Main Menu           |\n";
 			cout << "|                               |\n|          1. New Game          |\n";
-			cout << "|          2. Continue          |\n|         3. High Score         |\n";
+			cout << "|          2. Continue          |\n|        3. Instructions        |\n";
 			cout << "|            4. Exit            |\n|                               |\n";
 			cout << "---------------------------------";
 			
@@ -151,256 +346,51 @@ void display (int display_code) {
 			
 			break;
 		}
+		
+		
+		case 6: {
+			
+			system ("cls");
+			
+			cout << "Enter the target score for winnig: ";
+			
+			break;
+		}
+	
+		case 7: {
+			
+			cout << "Can't clip through the edge of the universe, can we!(Press the Enter key to continue . . .)";
+			cin.ignore();
+			
+			break;
+		}
+	
+		case 8: {
+			
+			
+			
+			
+			
+			
+			break;
+		}	
+	
 	
 	}
 
 }
 
-
-int MainMenu_input() {
+void setWinningScore (data& info) {
 	
-	while(true){
-		
-	    char menu_input;
-	    menu_input = getch(); 
+	display (6);	
 	
-	    switch (menu_input){
-		
-		    case '1': {
-			
-			    display  (1);
-			    
-			    char map_size_input;
-			    map_size_input = getch();
-			    
-			    switch (map_size_input){
-			    	
-			    	case '1': {
-						return 15;
-					}
-			    	
-			    	case '2': {
-						return 17;
-					}
-			    	
-			    	case '3': {
-						return 19;
-					}
-					
-					case '4': {
-						
-						while (true){
-						
-						    display (2);
-						
-						    int map_size;
-						    cin >> map_size;
-						    
-						    if (map_size < 15)
-						        display (3);
-						    
-							else if (map_size % 2 == 0){
-						    
-								display (4);
-						    
-							    return map_size + 1;	
-						    	
-							}
-							else
-							    return map_size;
-					    }
-					}
-				}
-			
-			    break;
-		    }
-		
-		    case '2': {
-			    break;
-		    }
-		
-		    case '3': {
-			    break;
-		    }
-		
-		    case '4': {
-			    exit(0);
-		    }
-		
-		    default: {
-			    break;
-		    }
-		
-	    } 
-	
-    }
-	
-	
+	cin >> info.winningScore;
 }
 
 
-void render (data& info, int** map){
+void spawnEnemy (data& info, int** map, vector<bullet>& bulletVector) {
 
-	system ("cls");
-			
- 	int rows = 2 * info.map_size + 1;
-    int cols = 4 * info.map_size + 1;
-    
-    cout << endl << "Hit points: " << info.friendly_hp;
-	
-	
-	for (int i = 0; i < cols - 32; i++)
-		cout << ' ';
-	
-	cout << "Enemy hit points: " << info.enemy_hp << endl; 
-    
-    for (int i = 0; i < rows; i++)	
-        for (int j = 0; j < cols; j++){
-            if (i % 2 == 0){
-                if (j % 4 == 0)
-                    cout << ' ';
-                else 
-                    cout << '-';	
-            }
-            else {
-                if (j % 4 == 0)
-                    cout << '|';
-                else if (j % 4 == 1 || j % 4 == 3)
-                    cout << ' ';
-                else {
-                    if (map[(j-2)/4][(i-1)/2]==0)
-						cout << ' ';
-					else if (map[(j-2)/4][(i-1)/2]==1)
-						cout << '#';
-					else if (map[(j-2)/4][(i-1)/2]==2)
-						cout << '*';
-					else
-						cout << '^';		
-                }
-            }  
-        
-            if (j == cols - 1)
-                cout << endl;
-        }			
-			
-}
-
-
-int** initialize_game (data& info) {
-
-    display(0);
-	
-	info.map_size = MainMenu_input();
-	
-	int** map = new int*[info.map_size];		//dynamically allocating memory for all the rows of the map combined.
-	
-	for (int i = 0; i < info.map_size; i++)		//dynamically allocating memory for every single row of the map.
-		map[i] = new int[info.map_size];
-	
-	for (int i = 0; i < info.map_size; i++)		//setting all the values to 0, meaning that in the start of the game, we have a completely empty map.
-		for ( int j = 0; j < info.map_size; j++)
-			map[i][j] = 0;
-			
-	map [info.map_size/2][info.map_size-1] = 1;	//changing the value in bottom middle of the map to 1, indicating the friendly ship.
-	info.friendly_x = info.map_size / 2;
-	info.friendly_y = info.map_size - 1;
-	
-	info.friendly_hp = 3;
-
-	info.enemy_hp = 0;            	            //making the enemy's hitpoints 0 in the start of the game so the run1 function spawns an enemy using the spawn_enemy function
-	
-	return map;
-}
-	
-	
-
-void run1 (data& info, int** map, vector<bullet>& bulletArray){
-	
-	if (info.enemy_hp == 0)
-	    spawn_enemy(info, map);
-	
-	render (info, map);
-	
-	
-	move_ship (info, map);
-	
-	move_bullet (info, map, bulletArray);
-	
-	remove_bullet (info, map, bulletArray);
-	
-	add_bullet (info, map, bulletArray);
-	bullet_colision (info, map, bulletArray);
-	
-	enemy_ship (info, map);
-	
-	bullet_colision (info, map, bulletArray);
-	
-	run1(info, map, bulletArray);
-	
-}
-
-
-void move_ship (data& info, int** map) {
-	
-	info.friendly_previous_x = info.friendly_x;
-	
-	int input; 
-	
-	input = getch(); 
-		
-	if (input == 224) {
-		
-		input = getch();
-		
-		switch (input){
-			
-			case 72: {
-				
-				display(5);
-				
-				break;
-			}
-			
-			case 80: {              //if user presses the down arrow key
-				break;
-			}
-			
-			case 75: {              //if user presses the left arrow key
-			
-				if (map[0][info.map_size - 1] == 1)
-				    break;
-			
-				map[info.friendly_x][info.friendly_y] = 0;
-			    info.friendly_x --;
-			    map[info.friendly_x][info.friendly_y] = 1;
-			    
-				break;
-			}
-		
-			case 77: {              //if user presses the right arrow key 
-				
-				if (map[info.map_size - 1][info.map_size - 1] == 1)
-				    break;
-			
-				map[info.friendly_x][info.friendly_y] = 0;
-			    info.friendly_x ++;
-			    map[info.friendly_x][info.friendly_y] = 1;
-			    
-				break;
-			}
-	    }
-	}
-	
-	else if (input == 27){		   //if the esc key gets pressed
-	    cout << "esc";
-	    cin.ignore();}
-	else 
-	    display(5);
-	
-}
-
-
-void spawn_enemy (data& info, int** map) {
+while (info.enemy_hp <= 0){
 	
 	info.enemy_size = rand() % 4 + 1;
 	
@@ -472,44 +462,180 @@ void spawn_enemy (data& info, int** map) {
 			break;
 		}
 	}
-}
-
-void enemy_ship (data& info, int** map) {
-
-	if (map [info.friendly_x][info.friendly_y - 1] == 2)	{				//checks if ships have colided with each other and destroys the enemy ship if they have
-		info.enemy_hp = 0; 
-		destroy_enemy (info, map);
-		info.friendly_hp --;}
-		
-	else if (info.enemy_y + info.enemy_size == info.map_size){				//checks if the enemy ship has exited the map and destroys it if it has
-		info.enemy_hp = 0;
-		info.friendly_hp --;
-		destroy_enemy (info, map);}
-
-	else {
-			
-	for (int i = info.enemy_x; i < info.enemy_x + info.enemy_size; i++)		//if none of the conditions mentioned above have happened, moves the enemy ship down by one unit	
-		for (int j = info.enemy_y; j < info.enemy_y + info.enemy_size; j++)
-			map[i][j] = 0;
-
-	info.enemy_y ++;
 	
-	for (int i = info.enemy_x; i < info.enemy_x + info.enemy_size; i++)		//if none of the conditions mentioned above have happened, moves the enemy ship down by one unit	
-		for (int j = info.enemy_y; j < info.enemy_y + info.enemy_size; j++)
-			map[i][j] = 2;
-	}
+	for (int i = info.enemy_x; i < info.enemy_size + info.enemy_x; i++ )
+		for (int j = info.enemy_y; j < info.enemy_size + info.enemy_y; j++)
+			for (int p = 0; p < bulletVector.size(); p++)
+				if (bulletVector[p].x == i && bulletVector[p].y == j){
+					
+					bullet temp;
+            
+        		    temp = bulletVector[p];
+            
+            		bulletVector[p] = bulletVector [bulletVector.size() - 1];
+            
+            		bulletVector [bulletVector.size() - 1] = temp;
+            
+            		bulletVector.pop_back();
+					
+					info.enemy_hp --;
+				}
+				
+	if (info.enemy_hp <= 0)
+		destroyEnemy (info, map);			
+
+}
 }
 
-void destroy_enemy (data& info, int** map) {
+void render (data& info, int** map) {
+	
+	system ("cls");
+			
+ 	int rows = 2 * info.map_size + 1;
+    int cols = 4 * info.map_size + 1;
+    
+    cout << endl << "Hit points: " << info.friendly_hp;
+	
+	
+	for (int i = 0; i < (cols - 45) / 2; i++)
+		cout << ' ';
+	
+	
+	cout << "Score: " << setw(7) << setfill('0') << info.score;
+	
+	for (int i = 0; i< (cols - 45) / 2 - 1; i++)
+		cout << ' ';
+	cout << "Enemy hit points: " << info.enemy_hp << endl; 
+    
+    for (int i = 0; i < rows; i++)	
+        for (int j = 0; j < cols; j++){
+            if (i % 2 == 0){
+                if (j % 4 == 0)
+                    cout << ' ';
+                else 
+                    cout << '-';	
+            }
+            else {
+                if (j % 4 == 0)
+                    cout << '|';
+                else if (j % 4 == 1 || j % 4 == 3)
+                    cout << ' ';
+                else {
+                    if (map[(j-2)/4][(i-1)/2]==0)
+						cout << ' ';
+					else if (map[(j-2)/4][(i-1)/2]==1)
+						cout << '#';
+					else if (map[(j-2)/4][(i-1)/2]==2)
+						cout << '*';
+					else
+						cout << '^';		
+                }
+            }  
+        
+            if (j == cols - 1)
+                cout << endl;
+        }			
+			
+}
+
+
+void moveFriendlyShip (data& info, int** map) {
+bool flag = false;
+	
+	info.friendly_previous_x = info.friendly_x;
+	
+	while (flag == false){
+	
+	int input; 
+	
+	input = getch(); 
+		
+	if (input == 224) {
+		
+		input = getch();
+		
+		switch (input){
+			
+			case 72: {
+				
+				display(5);
+				
+				break;
+			}
+			
+			case 80: {              //if user presses the down arrow key
+				flag = true;
+				break;
+			}
+			
+			case 75: {              //if user presses the left arrow key
+			
+				if (map[0][info.map_size - 1] == 1){
+				
+					display (7);
+					render (info, map);
+					break;
+				}
+				    
+				map[info.friendly_x][info.friendly_y] = 0;
+			    info.friendly_x --;
+			    map[info.friendly_x][info.friendly_y] = 1;
+			    
+			    flag = true;
+			    
+				break;
+			}
+		
+			case 77: {              //if user presses the right arrow key 
+				
+				if (map[info.map_size - 1][info.map_size - 1] == 1){
+				    display (7);
+					render (info, map);
+					break;
+				}
+			
+				map[info.friendly_x][info.friendly_y] = 0;
+			    info.friendly_x ++;
+			    map[info.friendly_x][info.friendly_y] = 1;
+			    
+			    flag = true;
+			    
+				break;
+			}
+	    }
+	}
+	
+	else if (input == 27){		   //if the esc key gets pressed
+	    cout << "esc";
+	    cin.ignore();
+	    flag = true;
+	}
+	else 
+	    display(5);
+	}
+	
+}
+
+void shipColision (data& info, int** map) {
+	
+	if (map[info.friendly_x][info.friendly_y - 1] == 2){
+		destroyEnemy (info, map);
+		info.friendly_hp --;
+	}
+	
+}
+
+void destroyEnemy (data& info, int** map) {
 	
 	for (int i = 0; i < info.map_size; i++)
-		for (int j = 0; j < info.map_size; j++)
+		for (int j =0; j < info.map_size; j++)
 			if (map[i][j] == 2)
 				map[i][j] = 0;
-		
+				
+	info.enemy_hp = 0;			
 }
 
-void add_bullet(data& info, int** map, vector<bullet>& bulletArray) {
+void addBullet(data& info, int** map, vector<bullet>& bulletVector) {
 
     bullet newBullet;
 
@@ -517,28 +643,98 @@ void add_bullet(data& info, int** map, vector<bullet>& bulletArray) {
 
     newBullet.y = info.friendly_y - 1;
 
-    bulletArray.push_back(newBullet);
+    bulletVector.push_back(newBullet);
 
     map[newBullet.x][newBullet.y] = 3;
 }
 
+void bulletColision (data& info, int** map, vector<bullet>& bulletVector) {
+
+	for (int i = 0; i < bulletVector.size(); i++)
+		if (map[bulletVector[i].x][bulletVector[i].y-1] == 2){
+		
+			map[bulletVector[i].x][bulletVector[i].y] = 0;
+		
+			bullet temp;
+            
+            temp = bulletVector[i];
+            
+            bulletVector[i] = bulletVector [bulletVector.size() - 1];
+            
+            bulletVector [bulletVector.size() - 1] = temp;
+            
+            bulletVector.pop_back();
+			
+			info.enemy_hp --;
+			
+			if (info.enemy_hp < 1) {
+				info.score += info.enemy_size * info.enemy_size * 2;
+				destroyEnemy (info, map);	
+				render (info, map);
+			}
+			
+			
+		}
+}
 
 
-void remove_bullet (data& info, int** map, vector<bullet>& bulletArray) {
+
 	
-    for (int i = 0; i < bulletArray.size(); i++) {				//checks if a bullet has exited the map, swaps it with the last bullet in the vector and removes it using the pop_back function
-        if (bulletArray[i].y < 0) {
-            map[bulletArray[i].x][bulletArray[i].y] = 0;
+void moveEnemyShip(data& info, int** map) {
+    if (info.enemy_y + info.enemy_size == info.map_size) {
+        // Enemy ship has exited the map
+        info.enemy_hp = 0;
+        info.friendly_hp--;
+        destroyEnemy(info, map);
+        render(info, map);
+    } else {
+        // Remove the enemy ship from its current position
+        for (int i = info.enemy_x; i < info.enemy_x + info.enemy_size; i++)
+            for (int j = info.enemy_y; j < info.enemy_y + info.enemy_size; j++)
+                if (i >= 0 && i < info.map_size && j >= 0 && j < info.map_size)
+                    map[i][j] = 0;
+
+        // Move the enemy ship down by one unit
+        info.enemy_y++;
+
+        // Place the enemy ship in its new position
+        for (int i = info.enemy_x; i < info.enemy_x + info.enemy_size; i++)
+            for (int j = info.enemy_y; j < info.enemy_y + info.enemy_size; j++)
+                if (i >= 0 && i < info.map_size && j >= 0 && j < info.map_size)
+                    map[i][j] = 2;
+    }
+}
+
+	
+
+
+void moveBullets (data& info, int** map, vector<bullet>& bulletVector) {
+
+	for (int i = 0; i < bulletVector.size(); i++)
+        map[bulletVector[i].x][bulletVector[i].y] = 0;
+
+    for (int i = 0; i < bulletVector.size(); i++)
+        bulletVector[i].y--;
+
+    for (int i = 0; i < bulletVector.size(); i++)
+        map[bulletVector[i].x][bulletVector[i].y] = 3;
+}
+
+void removeOutOfTheMapBullets (data& info, int** map, vector<bullet>& bulletVector) {
+
+	for (int i = 0; i < bulletVector.size(); i++) {				//checks if a bullet has exited the map, swaps it with the last bullet in the vector and removes it using the pop_back function
+        if (bulletVector[i].y < 0) {
+            map[bulletVector[i].x][bulletVector[i].y] = 0;
 
             bullet temp;
             
-            temp = bulletArray[i];
+            temp = bulletVector[i];
             
-            bulletArray[i] = bulletArray [bulletArray.size() - 1];
+            bulletVector[i] = bulletVector [bulletVector.size() - 1];
             
-            bulletArray [bulletArray.size() - 1] = temp;
+            bulletVector [bulletVector.size() - 1] = temp;
             
-            bulletArray.pop_back();
+            bulletVector.pop_back();
 
             break;
         }
@@ -546,81 +742,57 @@ void remove_bullet (data& info, int** map, vector<bullet>& bulletArray) {
 }
 
 
-
+void win (data& info, int** map, vector<bullet>& bulletVector) {
 	
-void move_bullet(data& info, int** map, vector<bullet>& bulletArray) {
-
-    for (int i = 0; i < bulletArray.size(); i++)
-        map[bulletArray[i].x][bulletArray[i].y] = 0;
-
-    for (int i = 0; i < bulletArray.size(); i++)
-        bulletArray[i].y--;
-
-    for (int i = 0; i < bulletArray.size(); i++)
-        map[bulletArray[i].x][bulletArray[i].y] = 3;
-}
-
-
-void bullet_colision (data& info, int** map, vector<bullet>& bulletArray) {
+	cout << "win";
 	
-	for (int i=0; i<bulletArray.size(); i++)
+	cout << "continue ? y/n";
+	
+	char input;
+	
+	input = getch();
+	
+	switch (input) {
 		
-		/*the reason why it checks two diffrent conditions is that when any key is pressed, two things happen: 1. enemy ship moves and 2. the bullets move.
-		so there is a possibility that if the enemy ship is Dart, the bullet goes through the enemy ship without effectiong it. this fixes it.*/ 
-		if (/*map[bulletArray[i].x][bulletArray[i].y - 1] == 2 ||*/ map[bulletArray[i].x][bulletArray[i].y] == 2){
+		case 'y' :{
 			
-			info.enemy_hp --;
+			infiniteContinue (info, map, bulletVector);
 			
-			bullet temp;
-			
-			temp = bulletArray[i];
-			
-			bulletArray [i] = bulletArray [bulletArray.size() - 1];
-	
-			bulletArray [bulletArray.size() - 1] = temp;	
-			
-			bulletArray.pop_back();
-			
-			update (info, map, bulletArray);
-			
-			if (info.enemy_hp <= 0) {
-				destroy_enemy (info, map);
-				render (info, map);
-			}
-			
-			if (map[info.friendly_x][info.friendly_y-1]==2){
-				info.enemy_hp = 0;
-				destroy_enemy (info, map);
-				render (info, map);
-			
-			
-			}
-			
+			break;
 		}
-	
+		
+		
+		case 'n' :{
+			
+			exit (0);
+			
+			
+			
+			break;
+		}	
+		
+		
+		default : {
+			display (5);
+			break;
+		}		
+		
+		
+		
+		
+		
+		
+		
+	}
+
 }
 
-
-
-void update (data& info, int** map, vector<bullet>& bulletArray) {
-
-	for (int i =0; i < info.map_size; i++)
-		for (int j = 0; j < info.map_size; j++)
-			if (map[i][j] == 3)
-				map[i][j] = 0;
-
-	for (int i = 0; i < bulletArray.size(); i++)
-		map[bulletArray[i].x][bulletArray[i].y] = 3;
-		
-	for (int i = info.enemy_x ; i < info.enemy_size + info.enemy_x; i++)
-		for (int j = info.enemy_y; j < info.enemy_size + info.enemy_y; j++)	
-			map[i][j] = 2;
-
-	for (int i=0; i<info.map_size; i++)
-		for (int j=0; j<info.map_size; j++)
-			if (map[i][j] == 1)
-				map[i][j] = 0;
+void lose (data& info) {
 	
-	map[info.friendly_x][info.friendly_y] = 1;
-
+	cout << "lose";
+	
+	_getch ();
+	
+	exit (0);
+	
 }
